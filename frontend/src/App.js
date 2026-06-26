@@ -1,53 +1,55 @@
-import { useEffect } from "react";
-import "@/App.css";
+import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
-import { HOME } from "@/constants/testIds";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          data-testid={HOME.emergentLink}
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+import { StoreProvider } from "./lib/store.jsx";
+import { Toaster } from "sonner";
+import Header from "./components/Header.jsx";
+import MobileBottomNav from "./components/MobileBottomNav.jsx";
+import Footer from "./components/Footer.jsx";
+import FloatingActions from "./components/FloatingActions.jsx";
+import Home from "./pages/Home.jsx";
+import Shop from "./pages/Shop.jsx";
+import ProductDetail from "./pages/ProductDetail.jsx";
+import Cart from "./pages/Cart.jsx";
+import Checkout from "./pages/Checkout.jsx";
+import OrderSuccess from "./pages/OrderSuccess.jsx";
+import TrackOrder from "./pages/TrackOrder.jsx";
+import FindItForMe from "./pages/FindItForMe.jsx";
+import AIAssistant from "./pages/AIAssistant.jsx";
+import Wishlist from "./pages/Wishlist.jsx";
+import HowItWorks from "./pages/HowItWorks.jsx";
+import DeliveryIslands from "./pages/DeliveryIslands.jsx";
+import Admin from "./pages/Admin.jsx";
 
 function App() {
   return (
-    <div className="App">
+    <div className="App min-h-screen bg-stone-50">
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <StoreProvider>
+          <Header />
+          <main className="pb-24 md:pb-0 min-h-[80vh]">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/shop" element={<Shop />} />
+              <Route path="/shop/:category" element={<Shop />} />
+              <Route path="/product/:slug" element={<ProductDetail />} />
+              <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/order-success/:orderNumber" element={<OrderSuccess />} />
+              <Route path="/track" element={<TrackOrder />} />
+              <Route path="/track/:orderNumber" element={<TrackOrder />} />
+              <Route path="/find-it-for-me" element={<FindItForMe />} />
+              <Route path="/ai" element={<AIAssistant />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/how-it-works" element={<HowItWorks />} />
+              <Route path="/delivery" element={<DeliveryIslands />} />
+              <Route path="/admin" element={<Admin />} />
+            </Routes>
+          </main>
+          <Footer />
+          <MobileBottomNav />
+          <FloatingActions />
+          <Toaster position="top-center" richColors closeButton />
+        </StoreProvider>
       </BrowserRouter>
     </div>
   );
