@@ -1,0 +1,157 @@
+{
+  "project_context": {
+    "domain": "E-commerce (Mobile-First Luxury Marketplace)",
+    "theme": "Light",
+    "archetype": "5 (Luxury - Light Variation)",
+    "vibe": "Maldives-specific concierge, local, trustworthy, luxury, colorful, fast, mobile-app-like. High contrast navy with warm cream backgrounds and emerald/coral accents."
+  },
+  "colors": {
+    "background": {
+      "default": "bg-stone-50",
+      "card": "bg-white",
+      "overlay": "bg-black/40"
+    },
+    "primary": {
+      "DEFAULT": "bg-slate-900",
+      "foreground": "text-white",
+      "hover": "hover:bg-slate-800"
+    },
+    "secondary": {
+      "DEFAULT": "bg-teal-700",
+      "foreground": "text-white",
+      "hover": "hover:bg-teal-600",
+      "description": "Emerald/Teal for Maldives/ocean connection"
+    },
+    "accent": {
+      "DEFAULT": "bg-rose-500",
+      "foreground": "text-white",
+      "hover": "hover:bg-rose-600",
+      "description": "Coral/Pink for offers, alerts, and badges"
+    },
+    "luxury_gold": {
+      "DEFAULT": "bg-amber-600",
+      "foreground": "text-white",
+      "hover": "hover:bg-amber-700"
+    },
+    "text": {
+      "primary": "text-slate-900",
+      "secondary": "text-slate-500",
+      "inverse": "text-white"
+    },
+    "border": {
+      "subtle": "border-stone-200",
+      "focus": "focus:ring-teal-700"
+    }
+  },
+  "typography": {
+    "fonts": {
+      "heading": "Cormorant Garamond, serif",
+      "body": "Inter, sans-serif"
+    },
+    "scale": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl font-serif tracking-tighter leading-tight text-slate-900",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl font-serif tracking-tight text-slate-900",
+      "h3": "text-xl sm:text-2xl font-serif tracking-tight text-slate-900",
+      "h4": "text-lg sm:text-xl font-semibold font-sans text-slate-900",
+      "body": "text-base font-sans text-slate-600 leading-relaxed",
+      "small": "text-sm font-sans text-slate-500",
+      "overline": "text-xs font-sans tracking-[0.2em] uppercase text-teal-700 font-semibold"
+    }
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous Spacing (p-6, p-8) and Bento Grids. Everything must feel like a premium mobile app. No jagged edges.",
+    "mobile_first_rules": {
+      "bottom_nav": "Sticky bottom bar using Glassmorphism (backdrop-blur-xl bg-white/80 border-t border-stone-200). Must contain Home, Shop, AI Concierge, Cart, Profile.",
+      "floating_actions": "WhatsApp button and AI Chat button must float above the bottom nav (e.g., bottom-20 right-4) so they don't overlap with the nav.",
+      "tap_targets": "Minimum 48px height for all interactive elements to ensure mobile accessibility."
+    },
+    "grids": {
+      "bento_marketing": "Use grid-cols-1 md:grid-cols-8 gap-6. Mix shapes (Hero col-span-full md:col-span-4, Square col-span-2).",
+      "product_grid": "grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6."
+    },
+    "surfaces": {
+      "cards": "bg-white rounded-2xl border border-stone-200 shadow-sm overflow-hidden",
+      "glass": "backdrop-blur-xl bg-white/70 border border-white/40 shadow-[0_8px_32px_rgba(0,0,0,0.04)]"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "rounded-full px-6 py-3 font-semibold transition-all bg-slate-900 text-white hover:bg-slate-800 hover:-translate-y-0.5",
+      "secondary": "rounded-full px-6 py-3 font-semibold transition-all bg-teal-700 text-white hover:bg-teal-600 hover:-translate-y-0.5",
+      "accent": "rounded-full px-6 py-3 font-semibold transition-all bg-rose-500 text-white hover:bg-rose-600 hover:-translate-y-0.5"
+    },
+    "badges": {
+      "pre_order": "bg-teal-100 text-teal-800 text-xs font-bold px-2 py-1 rounded-full",
+      "original": "bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded-full"
+    },
+    "images_and_media": {
+      "hero_overlay": "NEVER use flat black blanket. Use bg-gradient-to-t from-black/60 via-black/20 to-transparent.",
+      "border_radius": "rounded-2xl"
+    }
+  },
+  "image_urls": [
+    {
+      "category": "hero",
+      "description": "Elegant woman with shopping bags walking by Milan Cathedral - high fashion luxury vibe",
+      "url": "https://images.pexels.com/photos/972937/pexels-photo-972937.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    },
+    {
+      "category": "hero_alternate",
+      "description": "Sleek car parked in front of luxury store - premium delivery vibe",
+      "url": "https://images.pexels.com/photos/35572910/pexels-photo-35572910.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    },
+    {
+      "category": "category_cosmetics",
+      "description": "Fenty Beauty high end cosmetics flatlay",
+      "url": "https://images.pexels.com/photos/9620358/pexels-photo-9620358.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    },
+    {
+      "category": "category_electronics",
+      "description": "Modern electronics, apple laptop, gadgets flatlay",
+      "url": "https://images.unsplash.com/photo-1636115305669-9096bffe87fd?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDB8MHwxfHNlYXJjaHw0fHxtb2Rlcm4lMjBlbGVjdHJvbmljcyUyMGdhZGdldHN8ZW58MHx8fHwxNzgyNDcyOTU3fDA&ixlib=rb-4.1.0&q=85"
+    },
+    {
+      "category": "category_garments",
+      "description": "Premium clothing store interior",
+      "url": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwzfHxwcmVtaXVtJTIwZmFzaGlvbiUyMGdhcm1lbnRzfGVufDB8fHx8MTc4MjQ3Mjk3M3ww&ixlib=rb-4.1.0&q=85"
+    },
+    {
+      "category": "category_shoes",
+      "description": "Hype sneakers display",
+      "url": "https://images.pexels.com/photos/4061395/pexels-photo-4061395.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    },
+    {
+      "category": "category_gaming",
+      "description": "RGB gaming setup",
+      "url": "https://images.pexels.com/photos/7858742/pexels-photo-7858742.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    },
+    {
+      "category": "category_musical",
+      "description": "Acoustic guitar detail",
+      "url": "https://images.unsplash.com/photo-1541689592655-f5f52825a3b8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1ODB8MHwxfHNlYXJjaHwyfHxtdXNpY2FsJTIwaW5zdHJ1bWVudHMlMjBndWl0YXJ8ZW58MHx8fHwxNzgyNDcyOTczfDA&ixlib=rb-4.1.0&q=85"
+    },
+    {
+      "category": "category_sports",
+      "description": "Tennis racket and balls",
+      "url": "https://images.unsplash.com/photo-1602211844066-d3bb556e983b?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHwxfHxwcmVtaXVtJTIwc3BvcnRzJTIwZXF1aXBtZW50fGVufDB8fHx8MTc4MjQ3Mjk5MXww&ixlib=rb-4.1.0&q=85"
+    },
+    {
+      "category": "shipping_dhl",
+      "description": "DHL delivery truck for shipping logistics section",
+      "url": "https://images.pexels.com/photos/15218464/pexels-photo-15218464.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+    }
+  ],
+  "testing_and_accessibility": {
+    "data_testid": "ALL interactive and key informational elements MUST include a data-testid attribute in kebab-case based on their role (e.g. data-testid='add-to-cart-button', data-testid='ai-chat-trigger').",
+    "contrast": "Ensure white text on teal/navy has high contrast. Test against APCA standards."
+  },
+  "instructions_to_main_agent": [
+    "Use Lucide-React icons extensively for standard UI elements and WhatsApp/Social triggers. Do not rely on image logos for app icons.",
+    "Import Cormorant Garamond via Google Fonts in index.css: @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700&display=swap');",
+    "In tailwind.config.js, set fontFamily: { serif: ['Cormorant Garamond', 'serif'], sans: ['Inter', 'sans-serif'] }.",
+    "Implement the Sticky Bottom Nav strictly for mobile (hidden on md/lg screens).",
+    "Use Shadcn UI for complex interactives (Forms, Dropdowns) but customize them heavily using the rounded-2xl and stone-200 border aesthetic.",
+    "Ensure all sections use generous padding (py-16 md:py-24).",
+    "Use the provided category images in Bento grid structures to showcase the main categories (Garments, Cosmetics, Electronics, Gaming, Shoes, Musical, Sports)."
+  ]
+}
