@@ -1,11 +1,13 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useStore } from "../lib/store.jsx";
+import { useT } from "../lib/i18n.jsx";
 import { formatMVR } from "../lib/api";
 import { Trash2, ChevronRight, ShoppingBag } from "lucide-react";
 
 export default function Cart() {
   const { cart, removeFromCart, updateQty, subtotal, island, clearCart } = useStore();
+  const t = useT();
   const nav = useNavigate();
   const deliveryFee = cart.length > 0 ? island.fee : 0;
   const total = subtotal + deliveryFee;
@@ -14,16 +16,16 @@ export default function Cart() {
     return (
       <div className="mx-auto max-w-3xl px-4 py-24 text-center">
         <ShoppingBag className="h-12 w-12 mx-auto text-slate-300" />
-        <h1 className="font-display text-4xl mt-4">Your cart is empty</h1>
-        <p className="text-slate-500 mt-2">Time to browse some treasures.</p>
-        <Link to="/shop" className="mt-6 inline-block rounded-full bg-slate-900 text-white px-6 py-3 font-semibold">Continue shopping</Link>
+        <h1 className="font-display text-4xl mt-4">{t("cart.empty.title")}</h1>
+        <p className="text-slate-500 mt-2">{t("cart.empty.sub")}</p>
+        <Link to="/shop" className="mt-6 inline-block rounded-full bg-slate-900 text-white px-6 py-3 font-semibold">{t("nav.continue")}</Link>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 md:py-14">
-      <h1 className="font-display text-4xl md:text-5xl">Your cart <span className="text-teal-700">({cart.length})</span></h1>
+      <h1 className="font-display text-4xl md:text-5xl">{t("cart.title")} <span className="text-teal-700">({cart.length})</span></h1>
 
       <div className="mt-8 grid md:grid-cols-12 gap-8">
         <div className="md:col-span-8 space-y-3">
@@ -55,14 +57,14 @@ export default function Cart() {
 
         <aside className="md:col-span-4">
           <div className="rounded-2xl bg-white border border-stone-200 p-6">
-            <h3 className="font-display text-2xl">Order summary</h3>
+            <h3 className="font-display text-2xl">{t("cart.summary")}</h3>
             <div className="mt-5 space-y-3 text-sm">
-              <div className="flex justify-between"><span className="text-slate-500">Subtotal</span><span className="font-semibold">{formatMVR(subtotal)}</span></div>
-              <div className="flex justify-between"><span className="text-slate-500">Delivery to {island.island}</span><span className="font-semibold">{formatMVR(deliveryFee)}</span></div>
-              <div className="border-t border-stone-200 pt-3 flex justify-between text-base"><span className="font-semibold">Total</span><span className="font-bold text-xl">{formatMVR(total)}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">{t("cart.subtotal")}</span><span className="font-semibold">{formatMVR(subtotal)}</span></div>
+              <div className="flex justify-between"><span className="text-slate-500">{t("cart.deliveryTo")} {island.island}</span><span className="font-semibold">{formatMVR(deliveryFee)}</span></div>
+              <div className="border-t border-stone-200 pt-3 flex justify-between text-base"><span className="font-semibold">{t("cart.total")}</span><span className="font-bold text-xl">{formatMVR(total)}</span></div>
             </div>
             <button onClick={() => nav("/checkout")} className="mt-6 w-full rounded-full bg-slate-900 text-white py-3.5 font-semibold inline-flex items-center justify-center gap-2 hover:bg-slate-800" data-testid="cart-checkout-button">
-              Checkout <ChevronRight className="h-4 w-4" />
+              {t("cart.checkout")} <ChevronRight className="h-4 w-4" />
             </button>
             <p className="mt-3 text-xs text-slate-500 leading-relaxed">Pre-order items: final price confirmed by admin via WhatsApp after sourcing check.</p>
           </div>

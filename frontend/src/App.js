@@ -1,6 +1,7 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { StoreProvider } from "./lib/store.jsx";
+import { I18nProvider } from "./lib/i18n.jsx";
 import { Toaster } from "sonner";
 import Header from "./components/Header.jsx";
 import MobileBottomNav from "./components/MobileBottomNav.jsx";
@@ -24,7 +25,8 @@ function App() {
   return (
     <div className="App min-h-screen bg-stone-50">
       <BrowserRouter>
-        <StoreProvider>
+        <I18nProvider>
+          <StoreProvider>
           <Header />
           <main className="pb-24 md:pb-0 min-h-[80vh]">
             <Routes>
@@ -50,6 +52,7 @@ function App() {
           <FloatingActions />
           <Toaster position="top-center" richColors closeButton />
         </StoreProvider>
+        </I18nProvider>
       </BrowserRouter>
     </div>
   );

@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { api, sessionId } from "../lib/api";
 import { useStore } from "../lib/store.jsx";
+import { useT } from "../lib/i18n.jsx";
 import { TRENDING_PROMPTS } from "../lib/seedData";
 import { Send, Sparkles } from "lucide-react";
 
-const GREETING = "Hi! I'm Raalhu, your shopping concierge for the Maldives. Ask about products, sizes, gifts, delivery, or anything else.";
-
 export default function AIAssistant() {
   const { island } = useStore();
+  const t = useT();
+  const GREETING = t("ai.greeting");
   const [messages, setMessages] = useState([{ role: "assistant", text: GREETING }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,8 +36,8 @@ export default function AIAssistant() {
     <div className="mx-auto max-w-5xl px-4 py-8 md:py-12 min-h-[80vh] flex flex-col">
       <div className="text-center">
         <div className="text-xs uppercase tracking-[0.3em] text-teal-700 font-semibold">Raalhu AI · Claude Sonnet 4.5</div>
-        <h1 className="font-display text-5xl md:text-6xl mt-2">Your Maldives concierge</h1>
-        <p className="text-slate-500 mt-2 max-w-xl mx-auto">Ask in plain English. I can find products, compare, suggest sizes, explain delivery, and draft sourcing quotes.</p>
+        <h1 className="font-display text-5xl md:text-6xl mt-2">{t("ai.title")}</h1>
+        <p className="text-slate-500 mt-2 max-w-xl mx-auto">{t("ai.sub")}</p>
       </div>
 
       <div ref={scrollRef} className="mt-8 flex-1 overflow-y-auto rounded-3xl bg-white border border-stone-200 p-5 md:p-7 space-y-4 max-h-[55vh]">
@@ -76,7 +77,7 @@ export default function AIAssistant() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask Raalhu anything…"
+            placeholder={t("ai.placeholder")}
             className="flex-1 bg-transparent px-2 py-3 text-base focus:outline-none"
             data-testid="ai-page-input"
           />

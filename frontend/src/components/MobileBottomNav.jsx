@@ -2,18 +2,20 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Home, ShoppingBag, Sparkles, Search, User } from "lucide-react";
 import { useStore } from "../lib/store.jsx";
+import { useT } from "../lib/i18n.jsx";
 
 export default function MobileBottomNav() {
   const loc = useLocation();
   const { cartCount } = useStore();
+  const t = useT();
   if (loc.pathname.startsWith("/admin")) return null;
 
   const items = [
-    { to: "/", label: "Home", icon: Home, key: "home" },
-    { to: "/shop", label: "Shop", icon: ShoppingBag, key: "shop" },
-    { to: "/ai", label: "AI", icon: Sparkles, key: "ai", accent: true },
-    { to: "/find-it-for-me", label: "Find", icon: Search, key: "find" },
-    { to: "/cart", label: "Cart", icon: User, key: "cart", badge: cartCount },
+    { to: "/", label: t("bnav.home"), icon: Home, key: "home" },
+    { to: "/shop", label: t("bnav.shop"), icon: ShoppingBag, key: "shop" },
+    { to: "/ai", label: t("bnav.ai"), icon: Sparkles, key: "ai", accent: true },
+    { to: "/find-it-for-me", label: t("bnav.find"), icon: Search, key: "find" },
+    { to: "/cart", label: t("bnav.cart"), icon: User, key: "cart", badge: cartCount },
   ];
 
   return (

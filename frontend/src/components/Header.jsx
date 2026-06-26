@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { ShoppingBag, Heart, Search, Menu, X, Sparkles, MapPin, ChevronDown } from "lucide-react";
 import { useStore } from "../lib/store.jsx";
+import { useT } from "../lib/i18n.jsx";
+import LanguageToggle from "./LanguageToggle.jsx";
 import IslandSelector from "./IslandSelector.jsx";
 import { CATEGORIES } from "../lib/seedData.js";
 
 export default function Header() {
   const { cartCount, island, wishlist } = useStore();
+  const t = useT();
   const [open, setOpen] = useState(false);
   const [islandOpen, setIslandOpen] = useState(false);
   const [q, setQ] = useState("");
@@ -38,12 +41,13 @@ export default function Header() {
       {/* Top trust strip */}
       <div className="hidden md:block bg-slate-900 text-white text-xs">
         <div className="mx-auto max-w-7xl px-4 py-2 flex items-center justify-between">
-          <span className="tracking-wider uppercase font-semibold text-amber-300">Authentic branded products · India sourcing · Island-wide delivery</span>
-          <div className="flex gap-5 text-slate-300">
-            <Link to="/track" className="hover:text-white" data-testid="header-track-order">Track order</Link>
-            <Link to="/delivery" className="hover:text-white" data-testid="header-delivery-link">Delivery to islands</Link>
-            <Link to="/how-it-works" className="hover:text-white" data-testid="header-how-link">How it works</Link>
-            <Link to="/admin" className="hover:text-amber-300" data-testid="header-admin-link">Admin</Link>
+          <span className="tracking-wider uppercase font-semibold text-amber-300">{t("brand.tagline")}</span>
+          <div className="flex gap-5 text-slate-300 items-center">
+            <Link to="/track" className="hover:text-white" data-testid="header-track-order">{t("nav.track")}</Link>
+            <Link to="/delivery" className="hover:text-white" data-testid="header-delivery-link">{t("nav.delivery")}</Link>
+            <Link to="/how-it-works" className="hover:text-white" data-testid="header-how-link">{t("nav.how")}</Link>
+            <Link to="/admin" className="hover:text-amber-300" data-testid="header-admin-link">{t("nav.admin")}</Link>
+            <LanguageToggle className="ml-2 bg-white/5 border-white/20 hover:bg-white/10 text-white" />
           </div>
         </div>
       </div>
@@ -58,10 +62,10 @@ export default function Header() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700">
-            <Link to="/shop" className="hover:text-teal-700" data-testid="nav-shop">Shop</Link>
-            <Link to="/find-it-for-me" className="hover:text-teal-700" data-testid="nav-fifm">Find-it-for-me</Link>
+            <Link to="/shop" className="hover:text-teal-700" data-testid="nav-shop">{t("nav.shop")}</Link>
+            <Link to="/find-it-for-me" className="hover:text-teal-700" data-testid="nav-fifm">{t("nav.fifm")}</Link>
             <Link to="/ai" className="hover:text-teal-700 inline-flex items-center gap-1" data-testid="nav-ai">
-              <Sparkles className="h-4 w-4 text-amber-500" /> AI Concierge
+              <Sparkles className="h-4 w-4 text-amber-500" /> {t("nav.ai")}
             </Link>
           </nav>
 
@@ -121,7 +125,10 @@ export default function Header() {
           <div className="absolute left-0 top-0 h-full w-[82%] max-w-sm bg-white p-6 flex flex-col gap-5" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
               <span className="font-display text-2xl">Raalhu<span className="text-teal-700">.</span></span>
-              <button onClick={() => setOpen(false)} aria-label="Close menu"><X className="h-6 w-6" /></button>
+              <div className="flex items-center gap-2">
+                <LanguageToggle />
+                <button onClick={() => setOpen(false)} aria-label="Close menu"><X className="h-6 w-6" /></button>
+              </div>
             </div>
             <form onSubmit={(e) => { onSearch(e); setOpen(false); }}>
               <div className="relative">

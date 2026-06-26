@@ -4,11 +4,13 @@ import { ArrowRight, Sparkles, Search, MapPin, Truck, ShieldCheck, MessageCircle
 import { CATEGORIES, PRODUCTS, BRANDS, REVIEWS, TRENDING_PROMPTS, FULFILLMENT_STAGES } from "../lib/seedData";
 import ProductCard from "../components/ProductCard.jsx";
 import { useStore } from "../lib/store.jsx";
+import { useT } from "../lib/i18n.jsx";
 
 const heroImage = "https://images.pexels.com/photos/972937/pexels-photo-972937.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600";
 
 export default function Home() {
   const { island } = useStore();
+  const t = useT();
   const featured = PRODUCTS.filter((p) => p.is_featured).slice(0, 8);
 
   return (
@@ -22,35 +24,35 @@ export default function Home() {
         </div>
         <div className="relative mx-auto max-w-7xl px-4 py-20 md:py-32 grid md:grid-cols-12 gap-8 items-end">
           <div className="md:col-span-7 animate-fade-up">
-            <div className="text-xs uppercase tracking-[0.3em] text-amber-300 font-semibold mb-4">Maldives · India sourcing · since 2026</div>
+            <div className="text-xs uppercase tracking-[0.3em] text-amber-300 font-semibold mb-4">{t("hero.kicker")}</div>
             <h1 className="font-display text-5xl md:text-7xl leading-[0.95] tracking-tight text-balance">
-              Authentic brands.<br />
-              <span className="italic text-teal-300">Island-wide</span> delivery.
+              {t("hero.title.line1")}<br />
+              <span className="italic text-teal-300">{t("hero.title.line2.a")}</span> {t("hero.title.line2.b")}
             </h1>
             <p className="mt-5 max-w-xl text-base md:text-lg text-slate-200 leading-relaxed">
-              Pre-order original products from India and global markets. AI concierge that understands your atoll. WhatsApp-first service. No surprises.
+              {t("hero.subtitle")}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link to="/shop" className="inline-flex items-center gap-2 rounded-full bg-white text-slate-900 px-6 py-3 font-semibold hover:bg-amber-300 transition-colors" data-testid="hero-shop-cta">
-                Start shopping <ArrowRight className="h-4 w-4" />
+                {t("hero.cta.shop")} <ArrowRight className="h-4 w-4" />
               </Link>
               <Link to="/find-it-for-me" className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/20 backdrop-blur px-6 py-3 font-semibold hover:bg-white/20" data-testid="hero-fifm-cta">
-                <Search className="h-4 w-4" /> Find-it-for-me
+                <Search className="h-4 w-4" /> {t("hero.cta.fifm")}
               </Link>
               <Link to="/ai" className="inline-flex items-center gap-2 rounded-full gradient-coral px-6 py-3 font-semibold hover:opacity-90" data-testid="hero-ai-cta">
-                <Sparkles className="h-4 w-4" /> Ask AI
+                <Sparkles className="h-4 w-4" /> {t("hero.cta.ai")}
               </Link>
             </div>
             <div className="mt-8 flex flex-wrap items-center gap-6 text-xs text-slate-300">
-              <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-400" /> Admin-verified listings</span>
-              <span className="inline-flex items-center gap-2"><MessageCircle className="h-4 w-4 text-emerald-400" /> WhatsApp +960 791-2865</span>
-              <span className="inline-flex items-center gap-2"><Truck className="h-4 w-4 text-emerald-400" /> Delivery to all atolls</span>
+              <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-400" /> {t("hero.trust.verified")}</span>
+              <span className="inline-flex items-center gap-2"><MessageCircle className="h-4 w-4 text-emerald-400" /> {t("hero.trust.wa")}</span>
+              <span className="inline-flex items-center gap-2"><Truck className="h-4 w-4 text-emerald-400" /> {t("hero.trust.delivery")}</span>
             </div>
           </div>
 
           <div className="md:col-span-5">
             <div className="glass-dark rounded-3xl p-6 md:p-7">
-              <div className="text-xs uppercase tracking-widest text-teal-300 font-semibold">Currently delivering to</div>
+              <div className="text-xs uppercase tracking-widest text-teal-300 font-semibold">{t("hero.island.deliveringTo")}</div>
               <div className="mt-2 flex items-baseline gap-2">
                 <MapPin className="h-5 w-5 text-amber-300" />
                 <div className="font-display text-3xl">{island.island}</div>
@@ -78,8 +80,8 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-16 md:py-24">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <div className="text-xs uppercase tracking-[0.25em] text-teal-700 font-semibold">Shop by mood</div>
-            <h2 className="font-display text-4xl md:text-5xl mt-2">Seven worlds. One island concierge.</h2>
+            <div className="text-xs uppercase tracking-[0.25em] text-teal-700 font-semibold">{t("sec.shopByMood.kicker")}</div>
+            <h2 className="font-display text-4xl md:text-5xl mt-2">{t("sec.shopByMood.title")}</h2>
           </div>
           <Link to="/shop" className="hidden md:inline-flex items-center gap-1 text-sm font-semibold hover:text-teal-700">Explore all <ArrowRight className="h-4 w-4" /></Link>
         </div>
@@ -108,8 +110,8 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-12">
         <div className="flex items-end justify-between mb-8">
           <div>
-            <div className="text-xs uppercase tracking-[0.25em] text-rose-500 font-semibold">Hot pre-orders</div>
-            <h2 className="font-display text-3xl md:text-4xl mt-2">This week from India.</h2>
+            <div className="text-xs uppercase tracking-[0.25em] text-rose-500 font-semibold">{t("sec.hot.kicker")}</div>
+            <h2 className="font-display text-3xl md:text-4xl mt-2">{t("sec.hot.title")}</h2>
           </div>
           <Link to="/shop" className="text-sm font-semibold inline-flex items-center gap-1 hover:text-teal-700">See all <ArrowRight className="h-4 w-4" /></Link>
         </div>
