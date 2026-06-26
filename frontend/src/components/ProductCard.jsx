@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Heart, Plus } from "lucide-react";
 import { useStore } from "../lib/store.jsx";
+import { useT } from "../lib/i18n.jsx";
 import { formatMVR } from "../lib/api";
 import { toast } from "sonner";
 
@@ -14,8 +15,12 @@ const badgeStyles = {
   "Custom Sourcing": "bg-violet-100 text-violet-800",
 };
 
+// Map badge label → translation key
+const badgeKey = (b) => "badge." + b.replace(/[\s-]/g, "");
+
 export default function ProductCard({ product, size = "md" }) {
   const { addToCart, toggleWishlist, wishlist } = useStore();
+  const t = useT();
   const isWished = wishlist.includes(product.id);
   const off = product.compare_at_price_mvr ? Math.round(((product.compare_at_price_mvr - product.price_mvr) / product.compare_at_price_mvr) * 100) : 0;
 
@@ -32,14 +37,14 @@ export default function ProductCard({ product, size = "md" }) {
           {/* badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1 max-w-[70%]">
             {(product.badges || []).slice(0, 2).map((b) => (
-              <span key={b} className={`text-[10px] font-bold tracking-wide rounded-full px-2 py-0.5 ${badgeStyles[b] || "bg-slate-100 text-slate-800"}`}>{b}</span>
+              <span key={b} className={`text-[10px] font-bold tracking-wide rounded-full px-2 py-0.5 ${badgeStyles[b] || "bg-slate-100 text-slate-800"}`}>{t(badgeKey(b))}</span>
             ))}
           </div>
           {off > 0 && (
             <div className="absolute top-2 right-2 rounded-full bg-rose-500 text-white text-[10px] font-bold px-2 py-0.5">-{off}%</div>
           )}
           <button
-            onClick={(e) => { e.preventDefault(); toggleWishlist(product.id); toast.success(isWished ? "Removed from wishlist" : "Added to wishlist"); }}
+            onClick={(e) => { e.preventDefault(); toggleWishlist(product.id); toast.success(isWished ? t("product.wishlist.removed") : t("product.wishlist.added")); }}
             className="absolute bottom-2 right-2 h-9 w-9 rounded-full bg-white/85 backdrop-blur grid place-items-center hover:bg-white"
             aria-label="Toggle wishlist"
             data-testid={`wishlist-toggle-${product.slug}`}
@@ -59,9 +64,9 @@ export default function ProductCard({ product, size = "md" }) {
         </div>
       </Link>
       <button
-        onClick={() => { addToCart(product, 1); toast.success("Added to cart"); }}
+        onClick={() => { addToCart(product, 1); toast.success(t("product.addedToCart")); }}
         className="absolute bottom-3 right-3 h-10 w-10 rounded-full bg-slate-900 text-white grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
-        aria-label="Add to cart"
+        aria-label={t("product.addToCart")}
         data-testid={`add-to-cart-${product.slug}`}
       >
         <Plus className="h-4 w-4" />

@@ -75,7 +75,7 @@ export default function Header() {
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Search earbuds, sunscreen, abaya…"
+                placeholder={t("common.searchPlaceholder")}
                 className="w-full rounded-full border border-stone-200 bg-stone-50 px-9 py-2 text-sm placeholder:text-slate-400 focus:border-teal-700 focus:bg-white focus:outline-none"
                 data-testid="header-search-input"
               />
@@ -111,10 +111,10 @@ export default function Header() {
           <div className="mx-auto max-w-7xl px-4 flex gap-6 overflow-x-auto scroll-hide text-sm text-slate-600 h-11 items-center">
             {CATEGORIES.map((c) => (
               <Link key={c.slug} to={`/shop/${c.slug}`} className="whitespace-nowrap hover:text-teal-700 transition-colors" data-testid={`header-cat-${c.slug}`}>
-                {c.name}
+                {t(`cat.${c.slug}`)}
               </Link>
             ))}
-            <span className="ml-auto text-xs text-rose-500 font-semibold whitespace-nowrap">Free WhatsApp support · +960 791-2865</span>
+            <span className="ml-auto text-xs text-rose-500 font-semibold whitespace-nowrap">{t("hero.trust.wa")}</span>
           </div>
         </div>
       </header>
@@ -133,27 +133,27 @@ export default function Header() {
             <form onSubmit={(e) => { onSearch(e); setOpen(false); }}>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search…" className="w-full rounded-full border border-stone-200 bg-stone-50 px-9 py-2.5 text-sm" data-testid="mobile-search-input" />
+                <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("common.searchShort")} className="w-full rounded-full border border-stone-200 bg-stone-50 px-9 py-2.5 text-sm" data-testid="mobile-search-input" />
               </div>
             </form>
             <button onClick={() => { setIslandOpen(true); setOpen(false); }} className="flex items-center gap-2 text-left text-sm rounded-2xl border border-stone-200 p-3" data-testid="mobile-island-trigger">
               <MapPin className="h-4 w-4 text-teal-700" />
               <div className="flex-1">
-                <div className="text-xs text-slate-500">Delivering to</div>
+                <div className="text-xs text-slate-500">{t("island.deliveringTo")}</div>
                 <div className="font-semibold text-slate-900">{island.island}</div>
               </div>
               <ChevronDown className="h-4 w-4 opacity-60" />
             </button>
             <div className="space-y-1">
               {[
-                ["/shop", "Shop all"],
-                ["/find-it-for-me", "Find-it-for-me"],
-                ["/ai", "AI Shopping Concierge"],
-                ["/wishlist", "Wishlist"],
-                ["/track", "Track order"],
-                ["/delivery", "Delivery to islands"],
-                ["/how-it-works", "How pre-order works"],
-                ["/admin", "Admin"],
+                ["/shop", t("nav.shopAll")],
+                ["/find-it-for-me", t("nav.fifm")],
+                ["/ai", t("foot.linkAI")],
+                ["/wishlist", t("nav.wishlist")],
+                ["/track", t("nav.track")],
+                ["/delivery", t("nav.delivery")],
+                ["/how-it-works", t("foot.linkHow")],
+                ["/admin", t("nav.admin")],
               ].map(([to, label]) => (
                 <Link key={to} to={to} onClick={() => setOpen(false)} className="block py-3 border-b border-stone-100 text-slate-800" data-testid={`mobile-link-${to.replace(/\//g,'-')}`}>
                   {label}
@@ -161,8 +161,8 @@ export default function Header() {
               ))}
             </div>
             <div className="mt-auto text-xs text-slate-500">
-              <div className="font-semibold text-slate-900">Need help?</div>
-              <a href="https://wa.me/9607912865" className="text-teal-700">WhatsApp +960 791-2865</a>
+              <div className="font-semibold text-slate-900">{t("nav.needHelp")}</div>
+              <a href="https://wa.me/9607912865" className="text-teal-700">{t("hero.trust.wa")}</a>
             </div>
           </div>
         </div>

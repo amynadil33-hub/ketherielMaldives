@@ -2,12 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { X, Send, Sparkles } from "lucide-react";
 import { api, sessionId } from "../lib/api";
 import { useStore } from "../lib/store.jsx";
+import { useT } from "../lib/i18n.jsx";
 import { TRENDING_PROMPTS } from "../lib/seedData";
-
-const GREETING = "Hey! I'm Raalhu, your shopping concierge for Maldives. Ask me anything — I can find products, suggest gifts, explain delivery, or draft a custom sourcing quote.";
 
 export default function AIChatPanel({ open, onClose }) {
   const { island } = useStore();
+  const t = useT();
+  const GREETING = t("ai.panel.greeting");
   const [messages, setMessages] = useState([{ role: "assistant", text: GREETING }]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -27,7 +28,7 @@ export default function AIChatPanel({ open, onClose }) {
       const { data } = await api.post("/ai/chat", { session_id: sessionId, message: msg, context: { island: island.island } });
       setMessages((m) => [...m, { role: "assistant", text: data.reply || "(no reply)" }]);
     } catch (e) {
-      setMessages((m) => [...m, { role: "assistant", text: "Sorry, I couldn't reach the server. Try again in a moment." }]);
+      setMessages((m) => [...m, { role: "assistant", text: t("ai.error") }]);
     } finally {
       setLoading(false);
     }
@@ -44,8 +45,8 @@ export default function AIChatPanel({ open, onClose }) {
             <Sparkles className="h-5 w-5 text-amber-300" />
           </div>
           <div className="flex-1">
-            <div className="font-display text-xl leading-none">Raalhu AI</div>
-            <div className="text-xs text-teal-100">Your Maldives shopping concierge</div>
+            <div className="font-display text-xl leading-none">{t("ai.panel.title")}</div>
+            <div className="text-xs text-teal-100">{t("ai.panel.sub")}</div>
           </div>
           <button onClick={onClose} className="h-8 w-8 rounded-full bg-white/10 grid place-items-center hover:bg-white/20" aria-label="Close" data-testid="ai-chat-close"><X className="h-4 w-4" /></button>
         </div>
@@ -73,7 +74,7 @@ export default function AIChatPanel({ open, onClose }) {
 
           {messages.length === 1 && (
             <div className="pt-2">
-              <div className="text-[11px] uppercase tracking-widest text-slate-500 mb-2">Try asking</div>
+              <div className="text-[11px] uppercase tracking-widest text-slate-500 mb-2">{t("ai.tryAsk")}</div>
               <div className="flex flex-wrap gap-2">
                 {TRENDING_PROMPTS.map((p) => (
                   <button key={p} onClick={() => send(p)} className="text-xs bg-white border border-stone-200 hover:border-teal-700 hover:text-teal-700 rounded-full px-3 py-1.5" data-testid={`ai-suggested-prompt-${p.length}`}>
@@ -91,7 +92,7 @@ export default function AIChatPanel({ open, onClose }) {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask anything about shopping…"
+              placeholder={t("ai.panel.placeholder")}
               className="flex-1 rounded-full bg-stone-100 px-4 py-3 text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-teal-700"
               data-testid="ai-chat-input"
             />

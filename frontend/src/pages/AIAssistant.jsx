@@ -87,7 +87,7 @@ export default function AIAssistant() {
         </div>
       </form>
 
-      <p className="mt-4 text-center text-xs text-slate-400">AI suggestions are for shopping help only. Final orders and prices are always confirmed by our admin team.</p>
+      <p className="mt-4 text-center text-xs text-slate-400">{t("ai.disclaim")}</p>
     </div>
   );
 }

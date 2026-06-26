@@ -52,7 +52,7 @@ export default function Cart() {
               </button>
             </div>
           ))}
-          <button onClick={clearCart} className="text-sm text-slate-500 hover:text-rose-500" data-testid="cart-clear">Clear cart</button>
+          <button onClick={clearCart} className="text-sm text-slate-500 hover:text-rose-500" data-testid="cart-clear">{t("cart.clear")}</button>
         </div>
 
         <aside className="md:col-span-4">
@@ -66,7 +66,7 @@ export default function Cart() {
             <button onClick={() => nav("/checkout")} className="mt-6 w-full rounded-full bg-slate-900 text-white py-3.5 font-semibold inline-flex items-center justify-center gap-2 hover:bg-slate-800" data-testid="cart-checkout-button">
               {t("cart.checkout")} <ChevronRight className="h-4 w-4" />
             </button>
-            <p className="mt-3 text-xs text-slate-500 leading-relaxed">Pre-order items: final price confirmed by admin via WhatsApp after sourcing check.</p>
+            <p className="mt-3 text-xs text-slate-500 leading-relaxed">{t("cart.preorderNote")}</p>
           </div>
         </aside>
       </div>

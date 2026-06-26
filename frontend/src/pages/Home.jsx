@@ -57,19 +57,19 @@ export default function Home() {
                 <MapPin className="h-5 w-5 text-amber-300" />
                 <div className="font-display text-3xl">{island.island}</div>
               </div>
-              <div className="text-sm text-slate-300 mt-1">{island.atoll} atoll · +{island.min}–{island.max} days · MVR {island.fee} delivery</div>
+              <div className="text-sm text-slate-300 mt-1">{island.atoll} {t("hero.island.atoll")} · +{island.min}–{island.max} {t("product.days")} · MVR {island.fee} {t("hero.island.delivery")}</div>
               <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
                 <Link to="/track" className="rounded-2xl bg-white/10 hover:bg-white/15 p-4 transition-colors">
-                  <div className="text-xs uppercase tracking-widest text-teal-300">Track</div>
-                  <div className="font-semibold mt-1">Your order</div>
+                  <div className="text-xs uppercase tracking-widest text-teal-300">{t("nav.track")}</div>
+                  <div className="font-semibold mt-1">{t("foot.linkTrack")}</div>
                 </Link>
                 <Link to="/delivery" className="rounded-2xl bg-white/10 hover:bg-white/15 p-4 transition-colors">
-                  <div className="text-xs uppercase tracking-widest text-teal-300">Delivery</div>
-                  <div className="font-semibold mt-1">All atolls map</div>
+                  <div className="text-xs uppercase tracking-widest text-teal-300">{t("cart.delivery")}</div>
+                  <div className="font-semibold mt-1">{t("nav.delivery")}</div>
                 </Link>
               </div>
               <div className="mt-5 text-[11px] text-slate-400 leading-relaxed">
-                Pre-order final price & delivery confirmed by admin via WhatsApp after sourcing check.
+                {t("hero.island.confirm")}
               </div>
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function Home() {
             <div className="text-xs uppercase tracking-[0.25em] text-rose-500 font-semibold">{t("sec.hot.kicker")}</div>
             <h2 className="font-display text-3xl md:text-4xl mt-2">{t("sec.hot.title")}</h2>
           </div>
-          <Link to="/shop" className="text-sm font-semibold inline-flex items-center gap-1 hover:text-teal-700">See all <ArrowRight className="h-4 w-4" /></Link>
+          <Link to="/shop" className="text-sm font-semibold inline-flex items-center gap-1 hover:text-teal-700">{t("sec.hot.seeAll")} <ArrowRight className="h-4 w-4" /></Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           {featured.map((p) => <ProductCard key={p.id} product={p} />)}
@@ -124,25 +124,25 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-16">
         <div className="rounded-3xl overflow-hidden gradient-ocean text-white px-8 py-12 md:px-14 md:py-16 grid md:grid-cols-12 gap-8 items-center">
           <div className="md:col-span-7">
-            <div className="text-xs uppercase tracking-[0.3em] text-amber-300 font-semibold">Concierge sourcing</div>
-            <h2 className="font-display text-4xl md:text-5xl mt-3 leading-tight">Can't find it? <span className="italic text-teal-200">We'll find it.</span></h2>
-            <p className="mt-4 text-slate-200 max-w-xl">Paste any product link from Amazon, Myntra, Nykaa, or anywhere global. Our AI drafts a quote and a real human confirms via WhatsApp.</p>
+            <div className="text-xs uppercase tracking-[0.3em] text-amber-300 font-semibold">{t("sec.fifm.kicker")}</div>
+            <h2 className="font-display text-4xl md:text-5xl mt-3 leading-tight">{t("sec.fifm.title.a")} <span className="italic text-teal-200">{t("sec.fifm.title.b")}</span></h2>
+            <p className="mt-4 text-slate-200 max-w-xl">{t("sec.fifm.sub")}</p>
             <div className="mt-6 flex gap-3 flex-wrap">
               <Link to="/find-it-for-me" className="inline-flex items-center gap-2 rounded-full bg-white text-slate-900 px-6 py-3 font-semibold hover:bg-amber-300" data-testid="home-fifm-cta">
-                <Search className="h-4 w-4" /> Request a quote
+                <Search className="h-4 w-4" /> {t("sec.fifm.cta")}
               </Link>
               <a href="https://wa.me/9607912865?text=Hi%20Raalhu%2C%20I%20need%20help%20sourcing%20a%20product." className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 font-semibold hover:bg-white/10" data-testid="home-fifm-wa">
-                <MessageCircle className="h-4 w-4" /> WhatsApp us
+                <MessageCircle className="h-4 w-4" /> {t("sec.fifm.wa")}
               </a>
             </div>
           </div>
           <div className="md:col-span-5">
             <div className="rounded-2xl bg-white/10 backdrop-blur p-5 space-y-3">
               {[
-                { label: "Paste URL", val: "amazon.in/s/...gift-box" },
-                { label: "Or upload", val: "screenshot.jpg" },
-                { label: "Budget", val: "MVR 1,200" },
-                { label: "Deliver to", val: island.island },
+                { label: t("sec.fifm.label.url"), val: "amazon.in/s/...gift-box" },
+                { label: t("sec.fifm.label.upload"), val: "screenshot.jpg" },
+                { label: t("sec.fifm.label.budget"), val: "MVR 1,200" },
+                { label: t("sec.fifm.label.deliverTo"), val: island.island },
               ].map((r) => (
                 <div key={r.label} className="flex items-center justify-between border-b border-white/10 pb-2 last:border-0">
                   <span className="text-xs uppercase tracking-widest text-teal-200">{r.label}</span>
@@ -158,19 +158,19 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-12">
         <div className="grid md:grid-cols-12 gap-8 items-start">
           <div className="md:col-span-5">
-            <div className="text-xs uppercase tracking-[0.25em] text-teal-700 font-semibold">Raalhu AI Concierge</div>
-            <h2 className="font-display text-4xl md:text-5xl mt-3 leading-tight">Talk to a shopkeeper who knows India and your island.</h2>
-            <p className="text-slate-600 mt-5 max-w-md">Ask in plain English. Compare products. Pick gifts. Decode delivery. Powered by Claude Sonnet 4.5.</p>
+            <div className="text-xs uppercase tracking-[0.25em] text-teal-700 font-semibold">{t("sec.ai.kicker")}</div>
+            <h2 className="font-display text-4xl md:text-5xl mt-3 leading-tight">{t("sec.ai.title")}</h2>
+            <p className="text-slate-600 mt-5 max-w-md">{t("sec.ai.sub")}</p>
             <Link to="/ai" className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-900 text-white px-6 py-3 font-semibold hover:bg-slate-800" data-testid="home-ai-cta">
-              <Sparkles className="h-4 w-4 text-amber-300" /> Open full assistant
+              <Sparkles className="h-4 w-4 text-amber-300" /> {t("sec.ai.cta")}
             </Link>
           </div>
           <div className="md:col-span-7 grid sm:grid-cols-2 gap-3">
             {TRENDING_PROMPTS.map((p, i) => (
               <Link key={p} to="/ai" className="group rounded-2xl border border-stone-200 bg-white p-5 hover:border-teal-700 hover:-translate-y-0.5 transition-all" data-testid={`home-prompt-${i}`}>
-                <div className="text-xs uppercase tracking-widest text-rose-500 font-semibold">Prompt {i + 1}</div>
+                <div className="text-xs uppercase tracking-widest text-rose-500 font-semibold">{t("sec.ai.prompt")} {i + 1}</div>
                 <div className="mt-2 text-slate-900 font-semibold">{p}</div>
-                <div className="mt-3 text-xs text-slate-500 inline-flex items-center gap-1">Try it <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" /></div>
+                <div className="mt-3 text-xs text-slate-500 inline-flex items-center gap-1">{t("sec.ai.try")} <ArrowRight className="h-3 w-3 group-hover:translate-x-1 transition-transform" /></div>
               </Link>
             ))}
           </div>
@@ -181,16 +181,16 @@ export default function Home() {
       <section className="bg-stone-100 mt-16">
         <div className="mx-auto max-w-7xl px-4 py-16 md:py-24">
           <div className="text-center max-w-2xl mx-auto">
-            <div className="text-xs uppercase tracking-[0.25em] text-teal-700 font-semibold">How pre-order works</div>
-            <h2 className="font-display text-4xl md:text-5xl mt-3">From India shelf to your island. Tracked.</h2>
+            <div className="text-xs uppercase tracking-[0.25em] text-teal-700 font-semibold">{t("sec.howSummary.kicker")}</div>
+            <h2 className="font-display text-4xl md:text-5xl mt-3">{t("sec.howSummary.title")}</h2>
           </div>
           <div className="mt-12 grid md:grid-cols-5 gap-4">
             {[
-              { num: "01", title: "Choose product", note: "Browse or paste a URL" },
-              { num: "02", title: "Place order", note: "BML, m-Faisaa, slip upload" },
-              { num: "03", title: "Sourced from India", note: "Admin confirms supplier" },
-              { num: "04", title: "Arrives in Maldives", note: "Air freight to Male" },
-              { num: "05", title: "Delivered to island", note: "Local courier handoff" },
+              { num: "01", title: t("sec.howSummary.s1.t"), note: t("sec.howSummary.s1.n") },
+              { num: "02", title: t("sec.howSummary.s2.t"), note: t("sec.howSummary.s2.n") },
+              { num: "03", title: t("sec.howSummary.s3.t"), note: t("sec.howSummary.s3.n") },
+              { num: "04", title: t("sec.howSummary.s4.t"), note: t("sec.howSummary.s4.n") },
+              { num: "05", title: t("sec.howSummary.s5.t"), note: t("sec.howSummary.s5.n") },
             ].map((s) => (
               <div key={s.num} className="rounded-2xl bg-white border border-stone-200 p-5">
                 <div className="font-display text-3xl text-teal-700">{s.num}</div>
@@ -200,32 +200,32 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-8 text-center">
-            <Link to="/how-it-works" className="text-sm font-semibold text-teal-700 hover:underline">See the full 10-step timeline →</Link>
+            <Link to="/how-it-works" className="text-sm font-semibold text-teal-700 hover:underline">{t("sec.howSummary.viewFull")}</Link>
           </div>
         </div>
       </section>
 
       {/* BRANDS */}
       <section className="mx-auto max-w-7xl px-4 py-16">
-        <div className="text-xs uppercase tracking-[0.25em] text-teal-700 font-semibold text-center">Popular sourced brands</div>
-        <h2 className="font-display text-3xl md:text-4xl text-center mt-2">From India's best, to your atoll.</h2>
+        <div className="text-xs uppercase tracking-[0.25em] text-teal-700 font-semibold text-center">{t("sec.brands.kicker")}</div>
+        <h2 className="font-display text-3xl md:text-4xl text-center mt-2">{t("sec.brands.title")}</h2>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           {BRANDS.map((b) => (
             <div key={b.slug} className="rounded-full border border-stone-200 bg-white px-5 py-2 text-sm text-slate-700 hover:border-teal-700 hover:text-teal-700 transition-colors">
               {b.name}
-              {b.verified && <span className="ml-2 text-[10px] uppercase tracking-widest text-amber-600">Verified</span>}
+              {b.verified && <span className="ml-2 text-[10px] uppercase tracking-widest text-amber-600">{t("sec.brands.verified")}</span>}
             </div>
           ))}
         </div>
-        <p className="mt-6 text-center text-xs text-slate-500 max-w-2xl mx-auto">Brand names identify sourced products only. We do not claim official partnership unless marked verified by admin.</p>
+        <p className="mt-6 text-center text-xs text-slate-500 max-w-2xl mx-auto">{t("sec.brands.disclaimer")}</p>
       </section>
 
       {/* REVIEWS */}
       <section className="bg-slate-900 text-white">
         <div className="mx-auto max-w-7xl px-4 py-16 md:py-24">
           <div className="text-center max-w-2xl mx-auto">
-            <div className="text-xs uppercase tracking-[0.25em] text-amber-300 font-semibold">Loved across the Maldives</div>
-            <h2 className="font-display text-4xl md:text-5xl mt-3">Delivered, verified, repeated.</h2>
+            <div className="text-xs uppercase tracking-[0.25em] text-amber-300 font-semibold">{t("sec.reviews.kicker")}</div>
+            <h2 className="font-display text-4xl md:text-5xl mt-3">{t("sec.reviews.title")}</h2>
           </div>
           <div className="mt-12 grid md:grid-cols-4 gap-5">
             {REVIEWS.map((r, i) => (
@@ -236,7 +236,7 @@ export default function Home() {
                 <p className="mt-3 text-sm text-slate-200 leading-relaxed">"{r.comment}"</p>
                 <div className="mt-4 text-xs">
                   <div className="font-semibold">{r.name}</div>
-                  <div className="text-slate-400">{r.island} {r.verified && <span className="text-emerald-300">· verified buyer</span>}</div>
+                  <div className="text-slate-400">{r.island} {r.verified && <span className="text-emerald-300">· {t("sec.reviews.verified")}</span>}</div>
                 </div>
               </div>
             ))}

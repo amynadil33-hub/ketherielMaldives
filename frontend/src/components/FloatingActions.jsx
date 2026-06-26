@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { MessageCircle, Sparkles, X, Send } from "lucide-react";
+import { useLocation } from "react-router-dom";
+import { MessageCircle, Sparkles } from "lucide-react";
 import { waLink } from "../lib/api";
+import { useT } from "../lib/i18n.jsx";
 import AIChatPanel from "./AIChatPanel.jsx";
 
 export default function FloatingActions() {
   const loc = useLocation();
+  const t = useT();
   const [aiOpen, setAiOpen] = useState(false);
   if (loc.pathname.startsWith("/admin")) return null;
   if (loc.pathname === "/ai") return null; // already on AI page
@@ -29,7 +31,7 @@ export default function FloatingActions() {
           data-testid="floating-ai-button"
         >
           <Sparkles className="h-5 w-5 text-amber-300" />
-          <span className="text-sm font-semibold">Ask Raalhu AI</span>
+          <span className="text-sm font-semibold">{t("ai.fab")}</span>
         </button>
       </div>
       <AIChatPanel open={aiOpen} onClose={() => setAiOpen(false)} />
