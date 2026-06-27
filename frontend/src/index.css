@@ -1,0 +1,102 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thaana:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #fafaf9; /* stone-50 */
+  color: #0f172a; /* slate-900 */
+}
+
+code { font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace; }
+
+@layer base {
+  :root {
+    --background: 60 9% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 222 47% 11%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 175 60% 30%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 60 5% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 350 89% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 30 6% 90%;
+    --input: 30 6% 90%;
+    --ring: 175 60% 30%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+}
+
+@layer utilities {
+  .font-display { font-family: 'Cormorant Garamond', serif; letter-spacing: -0.01em; }
+  .font-thaana, .font-thaana * { font-family: 'Noto Sans Thaana', 'Inter', sans-serif; }
+  .font-thaana .font-display { font-family: 'Noto Sans Thaana', 'Cormorant Garamond', serif; font-weight: 600; letter-spacing: 0; }
+  /* When the page is RTL, flip a couple of obviously-directional utilities */
+  [dir="rtl"] .scroll-hide { direction: rtl; }
+  .text-balance { text-wrap: balance; }
+  .gradient-ocean {
+    background: linear-gradient(135deg, #0f766e 0%, #0e7490 60%, #1e293b 100%);
+  }
+  .gradient-sand {
+    background: linear-gradient(180deg, #fafaf9 0%, #f5f5f4 100%);
+  }
+  .gradient-coral {
+    background: linear-gradient(135deg, #fb7185 0%, #f43f5e 100%);
+  }
+  .gradient-gold {
+    background: linear-gradient(135deg, #f59e0b 0%, #b45309 100%);
+  }
+  .glass {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.4);
+  }
+  .glass-dark {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(15,23,42,0.65);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .scroll-hide::-webkit-scrollbar { display: none; }
+  .scroll-hide { scrollbar-width: none; }
+  .grain {
+    background-image: radial-gradient(rgba(15,23,42,0.04) 1px, transparent 1px);
+    background-size: 3px 3px;
+  }
+  .text-shadow-lg { text-shadow: 0 4px 20px rgba(0,0,0,0.35); }
+}
+
+@layer base {
+  [data-debug-wrapper="true"] { display: contents !important; }
+  [data-debug-wrapper="true"] > * {
+    margin: inherit; padding: inherit; column-gap: inherit; row-gap: inherit; gap: inherit;
+    border-width: inherit; border-style: inherit; border-color: inherit;
+  }
+}
+
+/* Selection */
+::selection { background: #0f766e; color: #fff; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #d6d3d1; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #a8a29e; }
