@@ -16,7 +16,7 @@ export default function FloatingActions() {
     <>
       <div className="fixed right-4 bottom-24 md:bottom-6 z-30 flex flex-col gap-3 items-end">
         <a
-          href={waLink("Hi Raalhu, I need help with my order.")}
+          href={waLink("Hi Ketheriel Maldives, I need help with my order.")}
           target="_blank"
           rel="noreferrer"
           className="h-12 w-12 rounded-full bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 flex items-center justify-center hover:scale-105 transition-transform"

@@ -13,7 +13,7 @@ export default function Footer() {
     <footer className="mt-24 bg-slate-900 text-slate-300">
       <div className="mx-auto max-w-7xl px-4 py-16 grid gap-12 md:grid-cols-4">
         <div>
-          <Link to="/" className="font-display text-3xl text-white">Raalhu<span className="text-teal-400">.</span></Link>
+          <Link to="/" className="font-display text-3xl text-white">Ketheriel <span className="text-teal-400">Maldives</span></Link>
           <p className="mt-4 text-sm leading-relaxed text-slate-400 max-w-xs">
             {t("foot.sub")}
           </p>

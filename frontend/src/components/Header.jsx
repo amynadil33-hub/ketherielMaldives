@@ -27,8 +27,8 @@ export default function Header() {
     return (
       <header className="sticky top-0 z-40 w-full border-b border-stone-200 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-          <Link to="/" className="font-display text-2xl tracking-tight text-slate-900">
-            Raalhu<span className="text-teal-700">.</span>
+          <Link to="/" className="font-display text-xl tracking-tight text-slate-900">
+            Ketheriel <span className="text-teal-700">Maldives</span>
           </Link>
           <div className="text-xs uppercase tracking-[0.25em] text-teal-700 font-semibold">Admin Console</div>
           <Link to="/" className="text-sm text-slate-600 hover:text-slate-900" data-testid="admin-exit-storefront">Exit to storefront</Link>
@@ -58,8 +58,8 @@ export default function Header() {
           <button className="md:hidden p-2 -ml-2" onClick={() => setOpen(true)} data-testid="header-menu-button" aria-label="Open menu">
             <Menu className="h-6 w-6" />
           </button>
-          <Link to="/" className="font-display text-2xl md:text-3xl tracking-tight text-slate-900 mr-2" data-testid="header-logo">
-            Raalhu<span className="text-teal-700">.</span>
+          <Link to="/" className="font-display text-xl md:text-2xl tracking-tight text-slate-900 mr-2 whitespace-nowrap" data-testid="header-logo">
+            Ketheriel <span className="text-teal-700">Maldives</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-700">
@@ -125,7 +125,7 @@ export default function Header() {
         <div className="md:hidden fixed inset-0 z-50 bg-black/50" onClick={() => setOpen(false)}>
           <div className="absolute left-0 top-0 h-full w-[82%] max-w-sm bg-white p-6 flex flex-col gap-5" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between">
-              <span className="font-display text-2xl">Raalhu<span className="text-teal-700">.</span></span>
+              <span className="font-display text-2xl">Ketheriel <span className="text-teal-700">Maldives</span></span>
               <div className="flex items-center gap-2">
                 <LanguageToggle />
                 <button onClick={() => setOpen(false)} aria-label="Close menu"><X className="h-6 w-6" /></button>

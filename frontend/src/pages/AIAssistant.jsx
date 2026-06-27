@@ -35,7 +35,7 @@ export default function AIAssistant() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 md:py-12 min-h-[80vh] flex flex-col">
       <div className="text-center">
-        <div className="text-xs uppercase tracking-[0.3em] text-teal-700 font-semibold">Raalhu AI · Claude Sonnet 4.5</div>
+        <div className="text-xs uppercase tracking-[0.3em] text-teal-700 font-semibold">Ketheriel Maldives AI · Claude Sonnet 4.5</div>
         <h1 className="font-display text-5xl md:text-6xl mt-2">{t("ai.title")}</h1>
         <p className="text-slate-500 mt-2 max-w-xl mx-auto">{t("ai.sub")}</p>
       </div>

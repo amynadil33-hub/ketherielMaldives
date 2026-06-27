@@ -6,7 +6,7 @@ import { useCatalog } from "../lib/catalog.jsx";
 import { Lock, Package, ShoppingBag, Search, FileText, Upload, Sparkles, RefreshCw, ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-const ADMIN_PASS = "raalhu2026";
+const ADMIN_PASS = "ketheriel2026";
 
 export default function Admin() {
   const { adminAuthed, setAdminAuthed } = useStore();
@@ -24,7 +24,7 @@ export default function Admin() {
             <input type="password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Passphrase" className="w-full rounded-full border border-stone-200 px-5 py-3 text-sm" data-testid="admin-password-input" />
             <button type="submit" className="w-full rounded-full bg-slate-900 text-white py-3 font-semibold" data-testid="admin-login-button">Enter</button>
           </form>
-          <p className="text-[11px] text-slate-400 mt-4">Hint for demo: raalhu2026 (replace with Supabase auth later)</p>
+          <p className="text-[11px] text-slate-400 mt-4">Hint for demo: ketheriel2026 (replace with Supabase auth later)</p>
         </div>
       </div>
     );

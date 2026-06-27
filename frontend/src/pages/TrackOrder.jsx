@@ -65,7 +65,7 @@ export default function TrackOrder() {
               <div className="font-display text-3xl">{order.order_number}</div>
               <div className="text-sm text-slate-500 mt-1">{t("track.placedFor")} {order.customer_name} · {order.island}</div>
             </div>
-            <a href={waLink(`Hi Raalhu, please update me on order ${order.order_number}.`)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-emerald-500 text-white px-5 py-2.5 text-sm font-semibold hover:bg-emerald-600" data-testid="track-whatsapp">
+            <a href={waLink(`Hi Ketheriel Maldives, please update me on order ${order.order_number}.`)} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-emerald-500 text-white px-5 py-2.5 text-sm font-semibold hover:bg-emerald-600" data-testid="track-whatsapp">
               <MessageCircle className="h-4 w-4" /> {t("track.messageUs")}
             </a>
           </div>

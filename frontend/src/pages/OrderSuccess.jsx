@@ -70,7 +70,7 @@ export default function OrderSuccess() {
               <span>{order.address_line}, {order.island} ({order.atoll})</span>
             </div>
           </div>
-          <a href={waLink(`Hi Raalhu, I just placed order ${order.order_number}.`)} target="_blank" rel="noreferrer" className="block w-full rounded-full bg-emerald-500 text-white text-center py-3 font-semibold hover:bg-emerald-600 inline-flex items-center justify-center gap-2" data-testid="order-success-whatsapp">
+          <a href={waLink(`Hi Ketheriel Maldives, I just placed order ${order.order_number}.`)} target="_blank" rel="noreferrer" className="block w-full rounded-full bg-emerald-500 text-white text-center py-3 font-semibold hover:bg-emerald-600 inline-flex items-center justify-center gap-2" data-testid="order-success-whatsapp">
             <MessageCircle className="h-4 w-4" /> {t("os.wa")}
           </a>
           <Link to={`/track/${order.order_number}`} className="block w-full rounded-full border border-slate-900 text-slate-900 text-center py-3 font-semibold hover:bg-slate-900 hover:text-white" data-testid="order-success-track">{t("os.track")}</Link>

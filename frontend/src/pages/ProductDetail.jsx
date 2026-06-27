@@ -152,7 +152,7 @@ export default function ProductDetail() {
             </button>
           </div>
           <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
-            <a href={waLink(`Hi Raalhu, I'm interested in: ${product.title} (${product.sku}). Can you confirm availability for ${island.island}?`)} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-500 text-emerald-700 py-2.5 font-semibold hover:bg-emerald-500 hover:text-white transition-colors" data-testid="whatsapp-product-button">
+            <a href={waLink(`Hi Ketheriel Maldives, I'm interested in: ${product.title} (${product.sku}). Can you confirm availability for ${island.island}?`)} target="_blank" rel="noreferrer" className="inline-flex items-center justify-center gap-2 rounded-full border border-emerald-500 text-emerald-700 py-2.5 font-semibold hover:bg-emerald-500 hover:text-white transition-colors" data-testid="whatsapp-product-button">
               <MessageCircle className="h-4 w-4" /> {t("product.wa.ask")}
             </a>
             <button onClick={() => { toggleWishlist(product.id); toast.success(isWished ? t("product.wishlist.removed") : t("product.wishlist.added")); }} className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 py-2.5 font-semibold hover:border-rose-500 hover:text-rose-500" data-testid="wishlist-button">

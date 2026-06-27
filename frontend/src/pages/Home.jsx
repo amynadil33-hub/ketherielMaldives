@@ -133,7 +133,7 @@ export default function Home() {
               <Link to="/find-it-for-me" className="inline-flex items-center gap-2 rounded-full bg-white text-slate-900 px-6 py-3 font-semibold hover:bg-amber-300" data-testid="home-fifm-cta">
                 <Search className="h-4 w-4" /> {t("sec.fifm.cta")}
               </Link>
-              <a href="https://wa.me/9607912865?text=Hi%20Raalhu%2C%20I%20need%20help%20sourcing%20a%20product." className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 font-semibold hover:bg-white/10" data-testid="home-fifm-wa">
+              <a href="https://wa.me/9607912865?text=Hi%20Ketheriel%20Maldives%2C%20I%20need%20help%20sourcing%20a%20product." className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3 font-semibold hover:bg-white/10" data-testid="home-fifm-wa">
                 <MessageCircle className="h-4 w-4" /> {t("sec.fifm.wa")}
               </a>
             </div>

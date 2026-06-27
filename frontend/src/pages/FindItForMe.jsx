@@ -160,7 +160,7 @@ export default function FindItForMe() {
                 </div>
               )}
             </div>
-            <a href={waLink("Hi Raalhu, I'd like to source a product. Here's the link/details:")} target="_blank" rel="noreferrer" className="block w-full rounded-2xl bg-emerald-500 text-white text-center py-3 font-semibold inline-flex items-center justify-center gap-2 hover:bg-emerald-600" data-testid="fifm-whatsapp">
+            <a href={waLink("Hi Ketheriel Maldives, I'd like to source a product. Here's the link/details:")} target="_blank" rel="noreferrer" className="block w-full rounded-2xl bg-emerald-500 text-white text-center py-3 font-semibold inline-flex items-center justify-center gap-2 hover:bg-emerald-600" data-testid="fifm-whatsapp">
               <MessageCircle className="h-4 w-4" /> {t("fifm.waDirect")}
             </a>
           </div>
