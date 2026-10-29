@@ -8,7 +8,7 @@ import { SlidersHorizontal, X } from "lucide-react";
 export default function Shop() {
   const { category } = useParams();
   const [sp] = useSearchParams();
-  const { categories, products: catalogProducts } = useCatalog();
+  const { categories, products: catalogProducts, loading, error } = useCatalog();
   const t = useT();
   const q = sp.get("q")?.toLowerCase() || "";
   const cat = categories.find((c) => c.slug === category);
@@ -78,7 +78,7 @@ export default function Shop() {
 
             {products.length === 0 ? (
               <div className="text-center py-20 text-slate-500">
-                <div className="font-display text-3xl text-slate-900">{t("shop.empty.title")}</div>
+                <div className="font-display text-3xl text-slate-900">{loading ? "Loading catalogue…" : error ? "Catalogue temporarily unavailable" : t("shop.empty.title")}</div>
                 <p className="mt-2">{t("shop.empty.sub")}</p>
                 <Link to="/find-it-for-me" className="mt-4 inline-block rounded-full bg-slate-900 text-white px-5 py-2 text-sm">{t("nav.fifm")}</Link>
               </div>

@@ -5,6 +5,7 @@ import { useT } from "../lib/i18n.jsx";
 import { CheckCircle2, MessageCircle, Copy, MapPin, Loader2 } from "lucide-react";
 import OrderTimeline from "../components/OrderTimeline.jsx";
 import { toast } from "sonner";
+import { orderAccessHeaders, orderAccessToken } from "../lib/orderAccess";
 
 export default function OrderSuccess() {
   const { orderNumber } = useParams();
@@ -14,7 +15,7 @@ export default function OrderSuccess() {
 
   useEffect(() => {
     let alive = true;
-    api.get(`/orders/${orderNumber}`).then(({ data }) => {
+    api.get(`/orders/${encodeURIComponent(orderNumber)}`, { headers: orderAccessHeaders(orderNumber) }).then(({ data }) => {
       if (alive) setOrder(data);
     }).catch(() => {}).finally(() => alive && setLoading(false));
     return () => { alive = false; };
@@ -32,7 +33,7 @@ export default function OrderSuccess() {
           <CheckCircle2 className="h-8 w-8" />
         </div>
         <h1 className="font-display text-4xl md:text-5xl mt-4">{t("os.placed")}</h1>
-        <p className="text-slate-500 mt-2">{t("os.confirmed")} {order.customer_phone}. {t("os.adminWa")}</p>
+        <p className="text-slate-500 mt-2">Your order has been recorded. Payment is pending verification.</p>
         <div className="mt-5 inline-flex items-center gap-2 bg-stone-100 rounded-full px-4 py-2 text-sm">
           <span className="text-slate-500">{t("os.orderNum")}</span>
           <span className="font-bold text-slate-900">{order.order_number}</span>
@@ -40,6 +41,14 @@ export default function OrderSuccess() {
         </div>
       </div>
 
+      <div className="mt-6 rounded-2xl border border-stone-200 bg-white p-5 text-sm">
+        <p>Keep your order number and private access code to track this order on another device. Treat the code as confidential.</p>
+        <button onClick={async () => {
+          try { await navigator.clipboard.writeText(orderAccessToken(orderNumber)); toast.success("Private access code copied"); }
+          catch { toast.error("Copy is unavailable. Select the code below to save it securely."); }
+        }} className="mt-3 rounded-full border border-slate-900 px-4 py-2">Copy private access code</button>
+        <input aria-label="Your private order access code" type="password" autoComplete="off" readOnly value={orderAccessToken(orderNumber)} className="mt-3 block w-full rounded-lg border p-2" />
+      </div>
       <div className="mt-10 grid md:grid-cols-12 gap-8">
         <div className="md:col-span-7 rounded-2xl bg-white border border-stone-200 p-6">
           <h3 className="font-display text-2xl">{t("os.timeline")}</h3>

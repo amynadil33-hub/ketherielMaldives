@@ -57,9 +57,9 @@ export default function Home() {
               <div className="text-xs uppercase tracking-widest text-teal-300 font-semibold">{t("hero.island.deliveringTo")}</div>
               <div className="mt-2 flex items-baseline gap-2">
                 <MapPin className="h-5 w-5 text-amber-300" />
-                <div className="font-display text-3xl">{island.island}</div>
+                <div className="font-display text-3xl">{island.island || "Choose a delivery area"}</div>
               </div>
-              <div className="text-sm text-slate-300 mt-1">{island.atoll} {t("hero.island.atoll")} · +{island.min}–{island.max} {t("product.days")} · MVR {island.fee} {t("hero.island.delivery")}</div>
+              {island.island && <div className="text-sm text-slate-300 mt-1">{island.atoll} {t("hero.island.atoll")} · +{island.min}–{island.max} {t("product.days")} · MVR {island.fee} {t("hero.island.delivery")}</div>}
               <div className="mt-5 grid grid-cols-2 gap-3 text-sm">
                 <Link to="/track" className="rounded-2xl bg-white/10 hover:bg-white/15 p-4 transition-colors">
                   <div className="text-xs uppercase tracking-widest text-teal-300">{t("nav.track")}</div>
@@ -98,7 +98,7 @@ export default function Home() {
                 <img src={c.img} alt={c.name} loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <div className="text-[10px] uppercase tracking-[0.3em] opacity-90">{c.count}+ products</div>
+                  <div className="text-[10px] uppercase tracking-[0.3em] opacity-90">{c.count} products</div>
                   <div className="font-display text-2xl md:text-3xl mt-1">{c.name}</div>
                   <div className="text-xs md:text-sm text-white/80 mt-1 line-clamp-1">{c.blurb}</div>
                 </div>
@@ -223,7 +223,7 @@ export default function Home() {
       </section>
 
       {/* REVIEWS */}
-      <section className="bg-slate-900 text-white">
+      {reviews.length > 0 && <section className="bg-slate-900 text-white">
         <div className="mx-auto max-w-7xl px-4 py-16 md:py-24">
           <div className="text-center max-w-2xl mx-auto">
             <div className="text-xs uppercase tracking-[0.25em] text-amber-300 font-semibold">{t("sec.reviews.kicker")}</div>
@@ -244,7 +244,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-      </section>
+      </section>}
     </div>
   );
 }

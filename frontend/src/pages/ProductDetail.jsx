@@ -7,6 +7,7 @@ import { formatMVR, waLink, computeDeliveryRange } from "../lib/api";
 import { Heart, ShoppingBag, MessageCircle, Sparkles, Truck, ShieldCheck, BadgeCheck, ChevronRight } from "lucide-react";
 import ProductCard from "../components/ProductCard.jsx";
 import { toast } from "sonner";
+import { productSelection } from "../lib/productOptions";
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -47,12 +48,13 @@ export default function ProductDetail() {
     </div>
   );
 
+  const variant = [size, color].filter(Boolean).join(" / ") || null;
+  const selection = productSelection(product, variant);
+  const displayPrice = selection?.price ?? product.price_mvr;
   const images = [product.main_image_url, ...(product.gallery_images || [])].filter(Boolean);
   const { min, max } = computeDeliveryRange(product, island);
-  const off = product.compare_at_price_mvr ? Math.round(((product.compare_at_price_mvr - product.price_mvr) / product.compare_at_price_mvr) * 100) : 0;
+  const off = product.compare_at_price_mvr ? Math.round(((product.compare_at_price_mvr - displayPrice) / product.compare_at_price_mvr) * 100) : 0;
   const isWished = wishlist.includes(product.id);
-
-  const variant = [size, color].filter(Boolean).join(" / ") || null;
 
   const handleBuyNow = () => {
     addToCart(product, qty, variant);
@@ -96,7 +98,7 @@ export default function ProductDetail() {
 
           {/* Price */}
           <div className="mt-4 flex items-baseline gap-3">
-            <span className="text-3xl font-bold text-slate-900" data-testid="product-price">{formatMVR(product.price_mvr)}</span>
+            <span className="text-3xl font-bold text-slate-900" data-testid="product-price">{formatMVR(displayPrice)}</span>
             {product.compare_at_price_mvr && (
               <span className="text-base text-slate-400 line-through">{formatMVR(product.compare_at_price_mvr)}</span>
             )}
@@ -108,8 +110,8 @@ export default function ProductDetail() {
           <div className="mt-5 rounded-2xl bg-stone-100 p-4 flex gap-3 items-start">
             <Truck className="h-5 w-5 text-teal-700 mt-0.5" />
             <div className="text-sm flex-1">
-              <div className="font-semibold text-slate-900">{t("product.deliverTo")} {island.island}</div>
-              <div className="text-slate-600">{t("product.estimated")} <span className="font-semibold">{min}–{max} {t("product.days")}</span> · MVR {island.fee} {t("product.deliveryFee")} · {island.courier}</div>
+              <div className="font-semibold text-slate-900">{island.island ? `${t("product.deliverTo")} ${island.island}` : "Choose a delivery area"}</div>
+              {island.island && min != null && max != null && <div className="text-slate-600">{t("product.estimated")} <span className="font-semibold">{min}–{max} {t("product.days")}</span> · MVR {island.fee} {t("product.deliveryFee")} · {island.courier}</div>}
             </div>
           </div>
 
@@ -139,15 +141,17 @@ export default function ProductDetail() {
           <div className="mt-5 inline-flex items-center rounded-full border border-stone-200">
             <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-4 py-2 text-lg" data-testid="qty-decrement">−</button>
             <span className="px-3 font-semibold min-w-8 text-center" data-testid="qty-value">{qty}</span>
-            <button onClick={() => setQty(qty + 1)} className="px-4 py-2 text-lg" data-testid="qty-increment">+</button>
+            <button onClick={() => setQty(Math.min(99, qty + 1))} className="px-4 py-2 text-lg" data-testid="qty-increment">+</button>
           </div>
 
+          {!selection && <p role="status" className="mt-4 text-sm text-amber-900">This option is unavailable. Please choose another option.</p>}
+          {product.product_type !== "preorder" && <p role="status" className="mt-4 text-sm text-amber-900">Ready-stock checkout is not yet available. Please contact support.</p>}
           {/* actions */}
           <div className="mt-6 grid grid-cols-2 gap-3">
-            <button onClick={() => { addToCart(product, qty, variant); toast.success(t("product.addedToCart")); }} className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white py-3 font-semibold transition-colors" data-testid="add-to-cart-button">
+            <button disabled={!selection} onClick={() => { addToCart(product, qty, variant); toast.success(t("product.addedToCart")); }} className="inline-flex items-center justify-center gap-2 rounded-full border border-slate-900 text-slate-900 hover:bg-slate-900 hover:text-white py-3 font-semibold transition-colors" data-testid="add-to-cart-button">
               <ShoppingBag className="h-4 w-4" /> {t("product.addToCart")}
             </button>
-            <button onClick={handleBuyNow} className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 text-white py-3 font-semibold hover:bg-slate-800" data-testid="buy-now-button">
+            <button disabled={!selection || product.product_type !== "preorder" || !island.island} onClick={handleBuyNow} className="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 text-white py-3 font-semibold hover:bg-slate-800" data-testid="buy-now-button">
               {t("product.buyNow")}
             </button>
           </div>

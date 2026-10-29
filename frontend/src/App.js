@@ -4,6 +4,7 @@ import { StoreProvider } from "./lib/store.jsx";
 import { I18nProvider } from "./lib/i18n.jsx";
 import { CatalogProvider } from "./lib/catalog.jsx";
 import { Toaster } from "sonner";
+import CatalogNotice from "./components/CatalogNotice.jsx";
 import Header from "./components/Header.jsx";
 import MobileBottomNav from "./components/MobileBottomNav.jsx";
 import Footer from "./components/Footer.jsx";
@@ -30,6 +31,7 @@ function App() {
           <CatalogProvider>
             <StoreProvider>
           <Header />
+          <CatalogNotice />
           <main className="pb-24 md:pb-0 min-h-[80vh]">
             <Routes>
               <Route path="/" element={<Home />} />

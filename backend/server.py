@@ -4,31 +4,41 @@ Primary role: AI concierge endpoints (Claude Sonnet 4.5 via Emergent LLM key)
 + lightweight order/sourcing storage in MongoDB so the demo works before
 Supabase is wired up.
 """
-from fastapi import FastAPI, APIRouter, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os, json, re, uuid, logging
 from pathlib import Path
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone
 
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+try:
+    from .commerce import router as commerce_router, require_admin, get_db
+except ImportError:
+    from commerce import router as commerce_router, require_admin, get_db
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-MONGO_URL = os.environ["MONGO_URL"]
-DB_NAME = os.environ["DB_NAME"]
+MONGO_URL = os.environ.get("MONGO_URL")
+DB_NAME = os.environ.get("DB_NAME")
 EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY", "")
 
-client = AsyncIOMotorClient(MONGO_URL)
-db = client[DB_NAME]
+client = AsyncIOMotorClient(MONGO_URL) if MONGO_URL and DB_NAME else None
+db = client[DB_NAME] if client is not None else None
 
 app = FastAPI(title="Maldives AI Retail Concierge")
+app.state.db = db
 api = APIRouter(prefix="/api")
+
+@app.middleware("http")
+async def private_api_responses(request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith("/api/"):
+        response.headers["Cache-Control"] = "no-store"
+    return response
 
 # ---------- helpers ----------
 def now_iso() -> str:
@@ -36,9 +46,6 @@ def now_iso() -> str:
 
 def new_id() -> str:
     return str(uuid.uuid4())
-
-def order_number() -> str:
-    return "MV" + datetime.now(timezone.utc).strftime("%y%m%d") + uuid.uuid4().hex[:5].upper()
 
 CONCIERGE_SYSTEM = """You are the Kether Madlives AI concierge — the friendly shopping concierge for a premium Maldives retail platform.
 Your job is to help Maldivian customers shop authentic branded products sourced from India and global markets.
@@ -63,6 +70,8 @@ async def claude_chat(session_id: str, system: str, user_text: str) -> str:
     """Single-turn Claude Sonnet 4.5 call. Returns raw text."""
     if not EMERGENT_LLM_KEY:
         return "AI is not configured. Please set EMERGENT_LLM_KEY."
+    from emergentintegrations.llm.chat import LlmChat, UserMessage
+
     chat = LlmChat(
         api_key=EMERGENT_LLM_KEY,
         session_id=session_id,
@@ -76,7 +85,7 @@ async def claude_chat(session_id: str, system: str, user_text: str) -> str:
         return getattr(resp, "text", str(resp))
     except Exception as exc:
         logging.exception("claude_chat failed")
-        return f"(AI temporarily unavailable: {exc})"
+        return "AI is temporarily unavailable. Please contact support."
 
 # ---------- models ----------
 class ChatRequest(BaseModel):
@@ -104,40 +113,13 @@ class SourcingRequest(BaseModel):
     quantity: int = 1
     notes: Optional[str] = None
 
-class OrderItem(BaseModel):
-    product_id: str
-    title: str
-    sku: Optional[str] = None
-    quantity: int = 1
-    price_mvr: float
-    variant: Optional[str] = None
-    main_image_url: Optional[str] = None
-    product_type: Optional[str] = "preorder"
-
-class OrderPayload(BaseModel):
-    customer_name: str
-    customer_phone: str
-    customer_email: Optional[str] = None
-    island: str
-    atoll: Optional[str] = None
-    address_line: str
-    notes: Optional[str] = None
-    payment_method: str
-    items: List[OrderItem]
-    subtotal_mvr: float
-    delivery_fee_mvr: float
-    discount_mvr: float = 0
-    total_mvr: float
-    estimated_delivery_min_days: int = 7
-    estimated_delivery_max_days: int = 14
-
 # ---------- routes: AI ----------
 @api.get("/")
 async def root():
     return {"service": "maldives-concierge", "status": "ok", "time": now_iso()}
 
 @api.post("/ai/chat")
-async def ai_chat(req: ChatRequest):
+async def ai_chat(req: ChatRequest, db=Depends(get_db)):
     ctx = ""
     if req.context:
         ctx = f"\n\nContext: {json.dumps(req.context)[:600]}"
@@ -186,7 +168,7 @@ class DescGenRequest(BaseModel):
     category: Optional[str] = None
 
 @api.post("/ai/product-description")
-async def ai_product_description(req: DescGenRequest):
+async def ai_product_description(req: DescGenRequest, _admin=Depends(require_admin)):
     prompt = f"""Rewrite this supplier text as premium but simple Maldives store copy.
 Brand: {req.brand or 'unknown'}, Category: {req.category or 'unknown'}
 Return JSON with keys: title, short_description (max 18 words), description (2-3 short paragraphs), tags (array of 5-8 SEO tags), badges (array).
@@ -223,7 +205,7 @@ Reply in 3 short bullet points, then a final recommendation."""
 
 # ---------- routes: sourcing & orders ----------
 @api.post("/sourcing-requests")
-async def create_sourcing(req: SourcingRequest):
+async def create_sourcing(req: SourcingRequest, db=Depends(get_db)):
     doc = req.model_dump()
     doc["id"] = new_id()
     doc["status"] = "new"
@@ -232,53 +214,17 @@ async def create_sourcing(req: SourcingRequest):
     return {"id": doc["id"], "status": "new"}
 
 @api.get("/sourcing-requests")
-async def list_sourcing():
+async def list_sourcing(_admin=Depends(require_admin), db=Depends(get_db)):
     rows = await db.sourcing_requests.find({}, {"_id": 0}).sort("created_at", -1).to_list(200)
     return rows
 
-@api.post("/orders")
-async def create_order(payload: OrderPayload):
-    doc = payload.model_dump()
-    doc["id"] = new_id()
-    doc["order_number"] = order_number()
-    doc["payment_status"] = "pending"
-    doc["fulfillment_status"] = "order_placed"
-    doc["created_at"] = now_iso()
-    doc["updated_at"] = now_iso()
-    await db.orders.insert_one(doc)
-    return {"id": doc["id"], "order_number": doc["order_number"], "status": "order_placed"}
-
-@api.get("/orders/{order_number}")
-async def get_order(order_number: str):
-    row = await db.orders.find_one({"order_number": order_number}, {"_id": 0})
-    if not row:
-        raise HTTPException(404, "Order not found")
-    return row
-
-@api.get("/orders")
-async def list_orders():
-    rows = await db.orders.find({}, {"_id": 0}).sort("created_at", -1).to_list(200)
-    return rows
-
-class OrderStatusUpdate(BaseModel):
-    fulfillment_status: str
-
-@api.patch("/orders/{order_id}/status")
-async def update_order_status(order_id: str, body: OrderStatusUpdate):
-    res = await db.orders.update_one(
-        {"id": order_id},
-        {"$set": {"fulfillment_status": body.fulfillment_status, "updated_at": now_iso()}}
-    )
-    if not res.matched_count:
-        raise HTTPException(404, "Order not found")
-    return {"ok": True}
-
 app.include_router(api)
+app.include_router(commerce_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_credentials=True,
-    allow_origins=os.environ.get("CORS_ORIGINS", "*").split(","),
+    allow_credentials=False,
+    allow_origins=[origin.strip() for origin in os.environ.get("CORS_ORIGINS", "").split(",") if origin.strip()],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -287,4 +233,5 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(mess
 
 @app.on_event("shutdown")
 async def shutdown():
-    client.close()
+    if client is not None:
+        client.close()

@@ -64,7 +64,7 @@ export default function ProductCard({ product, size = "md" }) {
         </div>
       </Link>
       <button
-        onClick={() => { addToCart(product, 1); toast.success(t("product.addedToCart")); }}
+        onClick={() => { if (product.size_options?.length || product.color_options?.length) { window.location.assign(`/product/${product.slug}`); return; } addToCart(product, 1); toast.success(t("product.addedToCart")); }}
         className="absolute bottom-3 right-3 h-10 w-10 rounded-full bg-slate-900 text-white grid place-items-center opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
         aria-label={t("product.addToCart")}
         data-testid={`add-to-cart-${product.slug}`}

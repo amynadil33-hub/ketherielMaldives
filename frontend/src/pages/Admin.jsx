@@ -1,17 +1,41 @@
 import React, { useEffect, useState } from "react";
-import { useStore } from "../lib/store.jsx";
+import { signInAdmin, signOutAdmin } from "../lib/adminAuth";
 import { api, formatMVR } from "../lib/api";
 import { FULFILLMENT_STAGES } from "../lib/seedData";
 import { useCatalog } from "../lib/catalog.jsx";
 import { Lock, Package, ShoppingBag, Search, FileText, Upload, Sparkles, RefreshCw, ExternalLink, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-const ADMIN_PASS = "ketheriel2026";
-
 export default function Admin() {
-  const { adminAuthed, setAdminAuthed } = useStore();
+  const [adminAuthed, setAdminAuthed] = useState(false);
+  const [email, setEmail] = useState("");
   const [pass, setPass] = useState("");
+  const [checking, setChecking] = useState(true);
+  const [signingIn, setSigningIn] = useState(false);
+  useEffect(() => {
+    let active = true;
+    if (sessionStorage.getItem("ketheriel_admin_access")) {
+      api.get("/admin/session").then(() => { if (active) setAdminAuthed(true); })
+        .catch(() => signOutAdmin()).finally(() => { if (active) setChecking(false); });
+    } else setChecking(false);
+    const expired = () => setAdminAuthed(false);
+    window.addEventListener("ketheriel-admin-expired", expired);
+    return () => { active = false; window.removeEventListener("ketheriel-admin-expired", expired); };
+  }, []);
+  const login = async (event) => {
+    event.preventDefault();
+    setSigningIn(true);
+    try {
+      await signInAdmin(email, pass);
+      setPass("");
+      setAdminAuthed(true);
+    } catch (error) {
+      toast.error(error.response?.status === 403 ? "This account does not have admin access." : "Admin sign-in failed or is not configured. Please contact the store owner.");
+    } finally { setSigningIn(false); }
+  };
   const [tab, setTab] = useState("overview");
+
+  if (checking) return <p role="status" className="p-8">Checking admin access…</p>;
 
   if (!adminAuthed) {
     return (
@@ -19,12 +43,13 @@ export default function Admin() {
         <div className="rounded-3xl bg-white border border-stone-200 p-8 max-w-md w-full">
           <Lock className="h-6 w-6 text-teal-700" />
           <h1 className="font-display text-3xl mt-3">Admin login</h1>
-          <p className="text-sm text-slate-500 mt-1">Restricted area. Enter the admin passphrase.</p>
-          <form onSubmit={(e) => { e.preventDefault(); if (pass === ADMIN_PASS) { setAdminAuthed(true); toast.success("Welcome, admin"); } else toast.error("Wrong password"); }} className="mt-5 space-y-3">
-            <input type="password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Passphrase" className="w-full rounded-full border border-stone-200 px-5 py-3 text-sm" data-testid="admin-password-input" />
-            <button type="submit" className="w-full rounded-full bg-slate-900 text-white py-3 font-semibold" data-testid="admin-login-button">Enter</button>
+          <p className="text-sm text-slate-500 mt-1">Sign in with your authorized store admin account.</p>
+          <form onSubmit={login} className="mt-5 space-y-3">
+            <input type="email" aria-label="Admin email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="Email" className="w-full rounded-full border border-stone-200 px-5 py-3 text-sm" />
+            <input aria-label="Admin password" autoComplete="current-password" required type="password" value={pass} onChange={(e) => setPass(e.target.value)} placeholder="Password" className="w-full rounded-full border border-stone-200 px-5 py-3 text-sm" data-testid="admin-password-input" />
+            <button type="submit" disabled={signingIn} className="w-full rounded-full bg-slate-900 text-white py-3 font-semibold" data-testid="admin-login-button">{signingIn ? "Signing in…" : "Sign in"}</button>
           </form>
-          <p className="text-[11px] text-slate-400 mt-4">Hint for demo: ketheriel2026 (replace with Supabase auth later)</p>
+
         </div>
       </div>
     );
@@ -50,7 +75,7 @@ export default function Admin() {
             </button>
           ))}
         </nav>
-        <button onClick={() => setAdminAuthed(false)} className="mt-4 w-full text-xs text-slate-500 hover:text-rose-500 px-3 py-2" data-testid="admin-logout">Sign out</button>
+        <button onClick={() => { signOutAdmin(); setAdminAuthed(false); }} className="mt-4 w-full text-xs text-slate-500 hover:text-rose-500 px-3 py-2" data-testid="admin-logout">Sign out</button>
       </aside>
       <div>
         {tab === "overview" && <Overview />}
@@ -68,8 +93,8 @@ function Overview() {
   const [orders, setOrders] = useState([]);
   const [sourcing, setSourcing] = useState([]);
   useEffect(() => {
-    api.get("/orders").then(({ data }) => setOrders(data || []));
-    api.get("/sourcing-requests").then(({ data }) => setSourcing(data || []));
+    api.get("/orders").then(({ data }) => setOrders(data || [])).catch(() => toast.error("Could not load orders"));
+    api.get("/sourcing-requests").then(({ data }) => setSourcing(data || [])).catch(() => toast.error("Could not load sourcing requests"));
   }, []);
   const revenue = orders.reduce((acc, o) => acc + (o.total_mvr || 0), 0);
   const stats = [
@@ -124,12 +149,14 @@ function Overview() {
 function Orders() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const load = () => { setLoading(true); api.get("/orders").then(({ data }) => { setRows(data || []); setLoading(false); }); };
+  const load = () => { setLoading(true); api.get("/orders").then(({ data }) => { setRows(data || []); setLoading(false); }).catch(() => { setLoading(false); toast.error("Could not load orders"); }); };
   useEffect(load, []);
   const advance = async (o) => {
     const idx = FULFILLMENT_STAGES.findIndex((s) => s.key === o.fulfillment_status);
     const next = FULFILLMENT_STAGES[Math.min(idx + 1, FULFILLMENT_STAGES.length - 1)];
-    await api.patch(`/orders/${o.id}/status`, { fulfillment_status: next.key });
+    try {
+      await api.patch(`/orders/${o.id}/status`, { fulfillment_status: next.key, expected_status: o.fulfillment_status });
+    } catch { toast.error("Status could not be changed. Refresh and try again."); return; }
     toast.success(`Moved to ${next.label}`);
     load();
   };
@@ -156,7 +183,7 @@ function Orders() {
                   <Td>{o.island}</Td>
                   <Td className="font-semibold">{formatMVR(o.total_mvr)}</Td>
                   <Td><span className="text-xs rounded-full bg-teal-50 text-teal-800 px-2 py-1">{(FULFILLMENT_STAGES.find((s) => s.key === o.fulfillment_status) || {}).label}</span></Td>
-                  <Td><button onClick={() => advance(o)} className="text-xs rounded-full bg-slate-900 text-white px-3 py-1.5 hover:bg-slate-800" data-testid={`advance-${o.id}`}>Advance →</button></Td>
+                  <Td><button disabled={o.fulfillment_status === "delivered"} onClick={() => advance(o)} className="text-xs rounded-full bg-slate-900 text-white px-3 py-1.5 hover:bg-slate-800" data-testid={`advance-${o.id}`}>Advance →</button></Td>
                 </tr>
               ))}
               {rows.length === 0 && <tr><td colSpan="6" className="p-8 text-center text-slate-500">No orders yet.</td></tr>}
@@ -170,7 +197,7 @@ function Orders() {
 
 function Sourcing() {
   const [rows, setRows] = useState([]);
-  useEffect(() => { api.get("/sourcing-requests").then(({ data }) => setRows(data || [])); }, []);
+  useEffect(() => { api.get("/sourcing-requests").then(({ data }) => setRows(data || [])).catch(() => toast.error("Could not load sourcing requests")); }, []);
   return (
     <div>
       <h1 className="font-display text-4xl">Sourcing Requests</h1>
