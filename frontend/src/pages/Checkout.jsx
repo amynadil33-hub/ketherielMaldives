@@ -1,33 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useStore } from "../lib/store.jsx";
 import { useT } from "../lib/i18n.jsx";
 import { useCatalog } from "../lib/catalog.jsx";
 import { api, formatMVR } from "../lib/api";
-import { Upload, CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { checkoutAttempt, rememberOrder, pendingCheckout, discardRejectedCheckout } from "../lib/orderAccess";
 
 export default function Checkout() {
-  const { cart, subtotal, island, setIsland, clearCart } = useStore();
-  const { islands } = useCatalog();
+  const { cart, subtotal, island, setIsland, clearCart, cartValid } = useStore();
+  const { islands, products } = useCatalog();
   const t = useT();
   const nav = useNavigate();
   const [form, setForm] = useState({
     customer_name: "", customer_phone: "", customer_email: "",
     atoll: island.atoll, island: island.island, address_line: "",
-    notes: "", payment_method: "bml_transfer",
+    notes: "", payment_method: "",
   });
   const [submitting, setSubmitting] = useState(false);
-  const [slipFile, setSlipFile] = useState(null);
+  const submittingRef = useRef(false);
+  const [pending, setPending] = useState(() => { try { return pendingCheckout(); } catch { return null; } });
+  const [configuration, setConfiguration] = useState(null);
+  const [configError, setConfigError] = useState("");
+  useEffect(() => {
+    let active = true;
+    api.get("/checkout/config").then(({ data }) => {
+      if (active) setConfiguration(data);
+    }).catch(() => { if (active) setConfigError("Checkout is temporarily unavailable."); });
+    return () => { active = false; };
+  }, []);
+  useEffect(() => {
+    setForm((previous) => ({ ...previous, island: island.island, atoll: island.atoll }));
+  }, [island.island, island.atoll]);
+  const PAYMENT_METHODS = configuration?.payment_methods || [];
+  const canOrder = cartValid && configuration?.enabled && PAYMENT_METHODS.some((p) => p.id === form.payment_method);
 
-  const PAYMENT_METHODS = [
-    { id: "bml_transfer", label: t("pay.bml"), note: t("pay.bml.note") },
-    { id: "mib_transfer", label: t("pay.mib"), note: t("pay.mib.note") },
-    { id: "mfaisaa", label: t("pay.mfaisaa"), note: t("pay.mfaisaa.note") },
-    { id: "dhiraagu_pay", label: t("pay.dhiraagu"), note: t("pay.dhiraagu.note") },
-    { id: "slip_upload", label: t("pay.slip"), note: t("pay.slip.note") },
-    { id: "cash_pickup", label: t("pay.cash"), note: t("pay.cash.note") },
-  ];
+  if (pending) return <CheckoutRecovery attempt={pending} cart={cart} clearCart={clearCart} />;
 
   if (cart.length === 0) {
     return (
@@ -40,8 +49,10 @@ export default function Checkout() {
 
   const deliveryFee = island.fee;
   const total = subtotal + deliveryFee;
-  const ed_min = Math.min(...cart.map((c) => 7)) + island.min;
-  const ed_max = Math.max(...cart.map((c) => 14)) + island.max;
+  const deliveryProducts = cart.map((c) => products.find((p) => p.id === c.id));
+  const hasDeliveryEstimate = deliveryProducts.every((p) => Number.isInteger(p?.estimated_delivery_min_days) && Number.isInteger(p?.estimated_delivery_max_days));
+  const ed_min = hasDeliveryEstimate ? Math.max(...deliveryProducts.map((p) => p.estimated_delivery_min_days)) + island.min : null;
+  const ed_max = hasDeliveryEstimate ? Math.max(...deliveryProducts.map((p) => p.estimated_delivery_max_days)) + island.max : null;
 
   const update = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -52,28 +63,38 @@ export default function Checkout() {
 
   const submit = async (e) => {
     e.preventDefault();
+    if (submittingRef.current || !canOrder) return;
     if (!form.customer_name || !form.customer_phone || !form.address_line) {
       toast.error(t("checkout.field.name") + " · " + t("checkout.field.phone") + " · " + t("checkout.field.address"));
       return;
     }
+    submittingRef.current = true;
     setSubmitting(true);
     try {
       const payload = {
-        ...form,
-        items: cart.map((c) => ({
-          product_id: c.id, title: c.title, sku: c.sku, quantity: c.qty,
-          price_mvr: c.price_mvr, variant: c.variant, main_image_url: c.main_image_url, product_type: c.product_type,
-        })),
-        subtotal_mvr: subtotal, delivery_fee_mvr: deliveryFee, discount_mvr: 0, total_mvr: total,
-        estimated_delivery_min_days: ed_min, estimated_delivery_max_days: ed_max,
+        customer_name: form.customer_name, customer_phone: form.customer_phone,
+        customer_email: form.customer_email || null, island: form.island,
+        address_line: form.address_line, notes: form.notes, payment_method: form.payment_method,
+        items: cart.map((c) => ({ product_id: c.id, quantity: c.qty, variant: c.variant })),
+        expected_total_mvr: Number(total.toFixed(2)),
       };
-      const { data } = await api.post("/orders", payload);
+      const attempt = checkoutAttempt(payload);
+      const { data } = await api.post("/orders", payload, {
+        headers: { "Idempotency-Key": attempt.key, "X-Order-Token": attempt.token },
+      });
+      rememberOrder(data.order_number, attempt.token);
       clearCart();
       nav(`/order-success/${data.order_number}`);
     } catch (err) {
-      console.error(err);
-      toast.error(t("ai.error"));
+      const detail = err.response?.data?.detail;
+      if ([422, 503].includes(err.response?.status) || detail?.code === "checkout_rejected") {
+        discardRejectedCheckout();
+      } else {
+        try { setPending(pendingCheckout()); } catch {}
+      }
+      toast.error(detail?.message || (typeof detail === "string" ? detail : err.message || "We could not complete checkout. Your cart is saved."));
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   };
@@ -83,6 +104,8 @@ export default function Checkout() {
       <h1 className="font-display text-4xl md:text-5xl">{t("checkout.title")}</h1>
       <p className="text-slate-500 mt-1">{t("checkout.sub")}</p>
 
+      {!cartValid && <p role="alert" className="mt-4 text-amber-900">Some items or delivery details need review. Refresh the catalogue and re-add any unavailable or changed items before ordering.</p>}
+      {(!configuration?.enabled || configError) && <p role="status" className="mt-4 text-amber-900">{configError || (configuration ? "Checkout is not yet available. Please contact support for help." : "Checking checkout availability…")}</p>}
       <form onSubmit={submit} className="mt-8 grid md:grid-cols-12 gap-8">
         <div className="md:col-span-8 space-y-6">
           {/* contact */}
@@ -128,18 +151,11 @@ export default function Checkout() {
                   <input type="radio" name="pm" checked={form.payment_method === p.id} onChange={() => update("payment_method", p.id)} className="mt-1 accent-teal-700" />
                   <div className="flex-1">
                     <div className="font-semibold text-slate-900">{p.label}</div>
-                    <div className="text-xs text-slate-500">{p.note}</div>
+                    <div className="text-xs text-slate-500">{p.instructions}</div>
                   </div>
                 </label>
               ))}
             </div>
-            {form.payment_method === "slip_upload" && (
-              <div className="mt-3 rounded-2xl border-2 border-dashed border-stone-300 p-6 text-center">
-                <Upload className="h-6 w-6 mx-auto text-slate-400" />
-                <p className="text-sm mt-2 text-slate-600">{slipFile ? slipFile.name : t("pay.slip.drop")}</p>
-                <input type="file" accept="image/*,application/pdf" onChange={(e) => setSlipFile(e.target.files?.[0])} className="mt-3 text-sm" data-testid="slip-upload" />
-              </div>
-            )}
           </Section>
         </div>
 
@@ -163,13 +179,13 @@ export default function Checkout() {
               <div className="flex justify-between"><span className="text-slate-500">{t("cart.subtotal")}</span><span className="font-semibold">{formatMVR(subtotal)}</span></div>
               <div className="flex justify-between"><span className="text-slate-500">{t("cart.delivery")}</span><span className="font-semibold">{formatMVR(deliveryFee)}</span></div>
               <div className="flex justify-between text-base pt-2 border-t border-stone-200"><span className="font-semibold">{t("cart.total")}</span><span className="font-bold text-xl">{formatMVR(total)}</span></div>
-              <div className="text-xs text-slate-500">{t("checkout.estimated")} <span className="font-semibold text-slate-900">{ed_min}–{ed_max} {t("product.days")}</span></div>
+              {hasDeliveryEstimate && <div className="text-xs text-slate-500">{t("checkout.estimated")} <span className="font-semibold text-slate-900">{ed_min}–{ed_max} {t("product.days")}</span></div>}
             </div>
-            <button disabled={submitting} type="submit" className="mt-6 w-full rounded-full bg-slate-900 text-white py-3.5 font-semibold disabled:opacity-60 inline-flex items-center justify-center gap-2" data-testid="checkout-place-order">
+            <button disabled={submitting || !canOrder} type="submit" className="mt-6 w-full rounded-full bg-slate-900 text-white py-3.5 font-semibold disabled:opacity-60 inline-flex items-center justify-center gap-2" data-testid="checkout-place-order">
               {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
               {submitting ? t("checkout.placing") : t("checkout.place")}
             </button>
-            <p className="mt-3 text-[11px] text-slate-500 leading-relaxed">{t("checkout.terms")}</p>
+            <p className="mt-3 text-[11px] text-slate-500 leading-relaxed">Your payment remains pending until it is verified. Review the order details before submitting.</p>
           </div>
         </aside>
       </form>
@@ -198,4 +214,35 @@ function Field({ label, required, children, testid }) {
       <div className="mt-1.5">{children}</div>
     </label>
   );
+}
+
+function CheckoutRecovery({ attempt, cart, clearCart }) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const navigating = useNavigate();
+  const inFlight = useRef(false);
+  const retry = async () => {
+    if (inFlight.current) return;
+    inFlight.current = true;
+    setBusy(true);
+    try {
+      const payload = JSON.parse(attempt.fingerprint);
+      const { data } = await api.post("/orders", payload, { headers: { "Idempotency-Key": attempt.key, "X-Order-Token": attempt.token } });
+      rememberOrder(data.order_number, attempt.token);
+      const currentItems = cart.map((item) => ({ product_id: item.id, quantity: item.qty, variant: item.variant }));
+      if (JSON.stringify(currentItems) === JSON.stringify(payload.items)) clearCart();
+      navigating(`/order-success/${data.order_number}`);
+    } catch (failure) {
+      const detail = failure.response?.data?.detail;
+      // After a lost response, even an unavailable service cannot prove the first request failed.
+      // Keep the original key until a receipt or verified support reconciliation is available.
+      setError(detail?.message || "We could not recover the order yet. Retry or contact support before placing another order.");
+    } finally { inFlight.current = false; setBusy(false); }
+  };
+  return <div className="mx-auto max-w-2xl px-4 py-16">
+    <h1 className="font-display text-3xl">Recover your previous checkout</h1>
+    <p className="mt-4">Your previous checkout did not receive a confirmation. Retry that same order first so it cannot be submitted twice.</p>
+    <button onClick={retry} disabled={busy} className="mt-6 rounded-full bg-slate-900 px-6 py-3 text-white disabled:opacity-50">{busy ? "Recovering…" : "Retry previous checkout"}</button>
+    {error && <p role="alert" className="mt-4 text-amber-900">{error}</p>}
+  </div>;
 }

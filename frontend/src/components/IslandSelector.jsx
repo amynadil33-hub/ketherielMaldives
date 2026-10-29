@@ -19,6 +19,7 @@ export default function IslandSelector({ open, onClose }) {
           <p className="text-sm text-slate-500">{t("island.sub")}</p>
         </DialogHeader>
         <div className="max-h-[60vh] overflow-y-auto px-2 pb-4">
+          {islands.length === 0 && <p role="status" className="px-4 py-6 text-sm">Delivery areas are not available yet. Please contact support.</p>}
           {islands.map((i) => {
             const active = i.island === island.island;
             return (

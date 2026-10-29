@@ -89,7 +89,7 @@ export default function Header() {
             data-testid="header-island-trigger"
           >
             <MapPin className="h-4 w-4 text-teal-700" />
-            <span className="truncate max-w-[120px]">{island.island}</span>
+            <span className="truncate max-w-[120px]">{island.island || "Choose area"}</span>
             <ChevronDown className="h-3 w-3 opacity-60" />
           </button>
 
@@ -141,7 +141,7 @@ export default function Header() {
               <MapPin className="h-4 w-4 text-teal-700" />
               <div className="flex-1">
                 <div className="text-xs text-slate-500">{t("island.deliveringTo")}</div>
-                <div className="font-semibold text-slate-900">{island.island}</div>
+                <div className="font-semibold text-slate-900">{island.island || "Choose area"}</div>
               </div>
               <ChevronDown className="h-4 w-4 opacity-60" />
             </button>

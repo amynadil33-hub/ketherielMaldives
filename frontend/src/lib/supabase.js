@@ -19,14 +19,13 @@ async function select(table, params) {
   const res = await fetch(tableUrl(table, params), {
     headers: {
       apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
+      ...(SUPABASE_KEY.split(".").length === 3 ? { Authorization: `Bearer ${SUPABASE_KEY}` } : {}),
       Accept: "application/json",
     },
   });
 
   if (!res.ok) {
-    const detail = await res.text().catch(() => "");
-    throw new Error(`Supabase ${table} request failed (${res.status}): ${detail || res.statusText}`);
+    throw new Error(`Catalogue request failed (${res.status})`);
   }
 
   return res.json();
@@ -43,7 +42,7 @@ export async function fetchSupabaseCatalog() {
       order: "name.asc",
     }),
     select("products", {
-      select: "*,brands(name,slug,is_verified,source_country),categories(name,slug)",
+      select: "*,brands(name,slug,is_verified,source_country),categories(name,slug),product_variants(*)",
       is_active: "eq.true",
       status: "eq.published",
       order: "is_featured.desc,title.asc",

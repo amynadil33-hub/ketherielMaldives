@@ -6,7 +6,7 @@ import { formatMVR } from "../lib/api";
 import { Trash2, ChevronRight, ShoppingBag } from "lucide-react";
 
 export default function Cart() {
-  const { cart, removeFromCart, updateQty, subtotal, island, clearCart } = useStore();
+  const { cart, removeFromCart, updateQty, subtotal, island, clearCart, cartValid } = useStore();
   const t = useT();
   const nav = useNavigate();
   const deliveryFee = cart.length > 0 ? island.fee : 0;
@@ -31,7 +31,7 @@ export default function Cart() {
         <div className="md:col-span-8 space-y-3">
           {cart.map((c) => (
             <div key={c.key} className="rounded-2xl bg-white border border-stone-200 p-4 flex gap-4" data-testid={`cart-item-${c.id}`}>
-              <Link to={`/product/${c.id}`} className="shrink-0">
+              <Link to={c.slug ? `/product/${c.slug}` : "/shop"} className="shrink-0">
                 <img src={c.main_image_url} alt={c.title} className="h-24 w-24 md:h-28 md:w-28 object-cover rounded-xl" />
               </Link>
               <div className="flex-1 min-w-0">
@@ -63,7 +63,8 @@ export default function Cart() {
               <div className="flex justify-between"><span className="text-slate-500">{t("cart.deliveryTo")} {island.island}</span><span className="font-semibold">{formatMVR(deliveryFee)}</span></div>
               <div className="border-t border-stone-200 pt-3 flex justify-between text-base"><span className="font-semibold">{t("cart.total")}</span><span className="font-bold text-xl">{formatMVR(total)}</span></div>
             </div>
-            <button onClick={() => nav("/checkout")} className="mt-6 w-full rounded-full bg-slate-900 text-white py-3.5 font-semibold inline-flex items-center justify-center gap-2 hover:bg-slate-800" data-testid="cart-checkout-button">
+            {!cartValid && <p role="alert" className="mt-4 text-sm text-amber-900">Refresh the catalogue and review your items and delivery area before checkout. Changed or unavailable items must be removed and re-added.</p>}
+            <button disabled={!cartValid} onClick={() => nav("/checkout")} className="mt-6 w-full rounded-full bg-slate-900 text-white py-3.5 font-semibold inline-flex items-center justify-center gap-2 hover:bg-slate-800 disabled:opacity-50" data-testid="cart-checkout-button">
               {t("cart.checkout")} <ChevronRight className="h-4 w-4" />
             </button>
             <p className="mt-3 text-xs text-slate-500 leading-relaxed">{t("cart.preorderNote")}</p>

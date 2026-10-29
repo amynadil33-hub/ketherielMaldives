@@ -1,31 +1,13 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import {
-  BRANDS,
-  CATEGORIES,
-  FULFILLMENT_STAGES,
-  ISLANDS,
-  PRODUCTS,
-  REVIEWS,
-  TRENDING_PROMPTS,
-} from "./seedData";
+import { FULFILLMENT_STAGES, TRENDING_PROMPTS } from "./seedData";
 import { fetchSupabaseCatalog, isSupabaseConfigured } from "./supabase";
 
-const fallbackCatalog = {
-  brands: BRANDS,
-  categories: CATEGORIES,
-  fulfillmentStages: FULFILLMENT_STAGES,
-  islands: ISLANDS,
-  products: PRODUCTS,
-  reviews: REVIEWS,
-  trendingPrompts: TRENDING_PROMPTS,
+const emptyCatalog = {
+  brands: [], categories: [], islands: [], products: [], reviews: [],
+  fulfillmentStages: FULFILLMENT_STAGES, trendingPrompts: TRENDING_PROMPTS,
 };
 
-const CatalogContext = createContext({
-  ...fallbackCatalog,
-  loading: false,
-  source: "seed",
-  error: null,
-});
+const CatalogContext = createContext({ ...emptyCatalog, loading: false, source: "unavailable", error: null });
 
 const asArray = (value) => (Array.isArray(value) ? value : []);
 const asNumber = (value, fallback = 0) => {
@@ -43,6 +25,7 @@ function normalizeProduct(row) {
     category,
     badges: asArray(row.badges),
     color_options: asArray(row.color_options),
+    product_variants: asArray(row.product_variants).filter((variant) => variant && typeof variant === "object"),
     compare_at_price_mvr: row.compare_at_price_mvr == null ? null : asNumber(row.compare_at_price_mvr),
     gallery_images: asArray(row.gallery_images),
     price_mvr: asNumber(row.price_mvr),
@@ -60,7 +43,7 @@ function normalizeCategory(row, productCounts) {
     icon: row.icon,
     gradient: row.color_gradient,
     img: row.image_url,
-    count: asNumber(row.product_count, productCounts[row.slug] || 0),
+    count: productCounts[row.slug] || 0,
     blurb: row.blurb || "",
   };
 }
@@ -96,7 +79,9 @@ function normalizeReview(row) {
 }
 
 function normalizeCatalog(raw) {
-  const products = asArray(raw.products).map(normalizeProduct);
+  const products = asArray(raw.products)
+    .filter((row) => row && row.status === "published" && row.is_active === true && Number.isFinite(Number(row.price_mvr)) && Number(row.price_mvr) > 0)
+    .map(normalizeProduct);
   const productCounts = products.reduce((acc, product) => {
     if (product.category) acc[product.category] = (acc[product.category] || 0) + 1;
     return acc;
@@ -105,28 +90,17 @@ function normalizeCatalog(raw) {
   return {
     brands: asArray(raw.brands).map(normalizeBrand),
     categories: asArray(raw.categories).map((row) => normalizeCategory(row, productCounts)),
-    islands: asArray(raw.islands).map(normalizeIsland),
+    islands: asArray(raw.islands).filter((row) => row?.is_active === true && row.delivery_fee_mvr != null && Number.isFinite(Number(row.delivery_fee_mvr)) && Number(row.delivery_fee_mvr) >= 0 && Number.isInteger(row.extra_min_days) && Number.isInteger(row.extra_max_days) && row.extra_min_days >= 0 && row.extra_max_days >= row.extra_min_days).map(normalizeIsland),
     products,
     reviews: asArray(raw.reviews).map(normalizeReview),
   };
 }
 
-function withFallback(remote) {
-  return {
-    ...fallbackCatalog,
-    brands: remote.brands.length ? remote.brands : fallbackCatalog.brands,
-    categories: remote.categories.length ? remote.categories : fallbackCatalog.categories,
-    islands: remote.islands.length ? remote.islands : fallbackCatalog.islands,
-    products: remote.products.length ? remote.products : fallbackCatalog.products,
-    reviews: remote.reviews.length ? remote.reviews : fallbackCatalog.reviews,
-  };
-}
-
 export function CatalogProvider({ children }) {
-  const [catalog, setCatalog] = useState(fallbackCatalog);
+  const [catalog, setCatalog] = useState(emptyCatalog);
   const [loading, setLoading] = useState(isSupabaseConfigured);
-  const [source, setSource] = useState("seed");
-  const [error, setError] = useState(null);
+  const [source, setSource] = useState("unavailable");
+  const [error, setError] = useState(isSupabaseConfigured ? null : new Error("Catalogue is not configured"));
 
   useEffect(() => {
     if (!isSupabaseConfigured) return;
@@ -137,15 +111,14 @@ export function CatalogProvider({ children }) {
     fetchSupabaseCatalog()
       .then((raw) => {
         if (!alive) return;
-        setCatalog(withFallback(normalizeCatalog(raw)));
+        setCatalog({ ...emptyCatalog, ...normalizeCatalog(raw) });
         setSource("supabase");
         setError(null);
       })
       .catch((err) => {
         if (!alive) return;
-        console.warn("Falling back to bundled seed data:", err);
-        setCatalog(fallbackCatalog);
-        setSource("seed");
+        setCatalog(emptyCatalog);
+        setSource("unavailable");
         setError(err);
       })
       .finally(() => {

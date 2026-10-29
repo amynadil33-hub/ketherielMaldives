@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api, formatMVR, waLink } from "../lib/api";
 import { useT } from "../lib/i18n.jsx";
+import { orderAccessHeaders, orderAccessToken } from "../lib/orderAccess";
 import { Search, Loader2, MessageCircle } from "lucide-react";
 import OrderTimeline from "../components/OrderTimeline.jsx";
 
@@ -10,15 +11,18 @@ export default function TrackOrder() {
   const t = useT();
   const nav = useNavigate();
   const [num, setNum] = useState(orderNumber || "");
+  const [accessToken, setAccessToken] = useState(() => orderAccessToken(orderNumber || ""));
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const lookup = async (n) => {
     if (!n) return;
+    const token = accessToken || orderAccessToken(n);
+    if (!token) { setOrder(null); setError("Enter your private order access code. Contact support if you no longer have it."); return; }
     setLoading(true); setError("");
     try {
-      const { data } = await api.get(`/orders/${n}`);
+      const { data } = await api.get(`/orders/${encodeURIComponent(n)}`, { headers: orderAccessHeaders(n, token) });
       setOrder(data);
     } catch (e) {
       setOrder(null);
@@ -33,8 +37,9 @@ export default function TrackOrder() {
 
   const submit = (e) => {
     e.preventDefault();
-    nav(`/track/${num.trim()}`);
-    lookup(num.trim());
+    const normalized = num.trim();
+    if (normalized === orderNumber) lookup(normalized);
+    else nav(`/track/${encodeURIComponent(normalized)}`);
   };
 
   return (
@@ -45,14 +50,15 @@ export default function TrackOrder() {
         <p className="text-slate-500 mt-2">{t("track.sub")}</p>
       </div>
 
-      <form onSubmit={submit} className="mt-8 flex gap-2 max-w-xl mx-auto">
-        <div className="flex-1 relative">
+      <form onSubmit={submit} className="mt-8 flex flex-wrap gap-2 max-w-xl mx-auto">
+        <div className="w-full relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input value={num} onChange={(e) => setNum(e.target.value)} placeholder="MV251104ABCDE" className="w-full rounded-full border border-stone-200 px-10 py-3 text-sm bg-white" data-testid="track-input" />
         </div>
         <button type="submit" className="rounded-full bg-slate-900 text-white px-6 font-semibold inline-flex items-center gap-2" data-testid="track-submit">
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : t("track.cta")}
         </button>
+        <input type="password" autoComplete="off" aria-label="Private order access code" value={accessToken} onChange={(e) => setAccessToken(e.target.value.trim())} placeholder="Private order access code" className="min-w-0 flex-1 rounded-full border border-stone-200 px-4 py-3 text-sm" />
       </form>
 
       {error && <p className="text-center text-sm text-rose-500 mt-4">{error}</p>}
